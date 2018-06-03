@@ -1,11 +1,11 @@
 # clap-verbosity-flag
 
-[![Build Status](https://travis-ci.org/killercup/clap-verbosity-flag.svg)][Travis]
+[![Build Status](https://travis-ci.org/rust-clique/clap-verbosity-flag.svg)][Travis]
 [![Documentation](https://img.shields.io/badge/docs-master-blue.svg)][Documentation]
 ![License](https://img.shields.io/crates/l/clap-verbosity-flag.svg)
 [![crates.io](https://img.shields.io/crates/v/clap-verbosity-flag.svg)][Crates.io]
 
-[Travis]: https://travis-ci.org/killercup/clap-verbosity-flag
+[Travis]: https://travis-ci.org/rust-clique/clap-verbosity-flag
 [Crates.io]: https://crates.io/crates/clap-verbosity-flag
 [Documentation]: https://docs.rs/clap-verbosity-flag/
 

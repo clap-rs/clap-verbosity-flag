@@ -5,7 +5,7 @@ authors = ["Pascal Hertleif <killercup@gmail.com>"]
 description = "Easily add a `--verbose` flag to CLIs using Structopt"
 readme = "Readme.md"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/killercup/clap-verbosity-flag"
+repository = "https://github.com/rust-clique/clap-verbosity-flag"
 
 [dependencies]
 log = "0.4.1"

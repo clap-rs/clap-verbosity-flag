@@ -50,11 +50,12 @@ impl Verbosity {
         }
     }
 
-    /// Initialize `env_logger` and set the log level for the given package.
+    /// Initialize `env_logger` and set the log level for the current package.
     ///
     /// All other modules default to printing warnings.
-    pub fn setup_env_logger(&self, own_pkg_name: &str) -> Result<(), Error> {
+    pub fn setup_env_logger(&self) -> Result<(), Error> {
         let level_filter = self.log_level().to_level_filter();
+        let own_pkg_name = env!("CARGO_PKG_NAME");
         LoggerBuilder::new()
             .filter(Some(&own_pkg_name.replace("-", "_")), level_filter)
             .filter(None, Level::Warn.to_level_filter())

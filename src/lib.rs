@@ -28,7 +28,7 @@ use log::Level;
 /// #
 /// # fn main() {}
 /// ```
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt, Debug, Clone)]
 pub struct Verbosity {
     /// Pass many times for more log output
     ///

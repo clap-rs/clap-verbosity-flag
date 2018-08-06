@@ -1,6 +1,6 @@
 [package]
 name = "clap-verbosity-flag"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Pascal Hertleif <killercup@gmail.com>"]
 description = "Easily add a `--verbose` flag to CLIs using Structopt"
 readme = "README.md"

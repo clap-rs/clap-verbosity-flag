@@ -4,8 +4,6 @@ extern crate log;
 #[macro_use]
 extern crate structopt;
 
-use env_logger::Builder as LoggerBuilder;
-use failure::Error;
 use log::Level;
 
 /// Easily add a `--verbose` flag to CLIs using Structopt
@@ -48,18 +46,6 @@ impl Verbosity {
             3 => Level::Debug,
             _ => Level::Trace,
         }
-    }
-
-    /// Initialize `env_logger` and set the log level for the given package.
-    ///
-    /// All other modules default to printing warnings.
-    pub fn setup_env_logger(&self, own_pkg_name: &str) -> Result<(), Error> {
-        let level_filter = self.log_level().to_level_filter();
-        LoggerBuilder::new()
-            .filter(Some(&own_pkg_name.replace("-", "_")), level_filter)
-            .filter(None, Level::Warn.to_level_filter())
-            .try_init()?;
-        Ok(())
     }
 }
 

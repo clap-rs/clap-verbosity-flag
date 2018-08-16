@@ -1,5 +1,3 @@
-extern crate env_logger;
-extern crate failure;
 extern crate log;
 #[macro_use]
 extern crate structopt;
@@ -30,21 +28,37 @@ use log::Level;
 pub struct Verbosity {
     /// Pass many times for more log output
     ///
-    /// By default, it'll only report errors. Passing `-v` one time also prints
-    /// warnings, `-vv` enables info logging, `-vvv` debug, and `-vvvv` trace.
+    /// By default it'll report log level info. Passing `-v` one time also
+    /// prints debug, `-vv` enables trace logging.
     #[structopt(long = "verbosity", short = "v", parse(from_occurrences))]
     verbosity: u8,
+    /// Suppress all log output.
+    ///
+    /// If you also pass `-v` it'll report errors. Passing `-vv` will also print
+    /// warnings, `-vvv` enables info logging, `-vvvv` debug, and `-vvvvv`
+    /// trace.
+    #[structopt(long = "quiet", short = "q")]
+    quiet: bool,
 }
 
 impl Verbosity {
     /// Get the log level.
-    pub fn log_level(&self) -> Level {
-        match self.verbosity {
-            0 => Level::Error,
-            1 => Level::Warn,
-            2 => Level::Info,
-            3 => Level::Debug,
-            _ => Level::Trace,
+    pub fn log_level(&self) -> Option<Level> {
+        if self.quiet {
+            match self.verbosity {
+                0 => None,
+                1 => Some(Level::Error),
+                2 => Some(Level::Warn),
+                3 => Some(Level::Info),
+                4 => Some(Level::Debug),
+                _ => Some(Level::Trace),
+            }
+        } else {
+            match self.verbosity {
+                0 => Some(Level::Info),
+                1 => Some(Level::Debug),
+                _ => Some(Level::Trace),
+            }
         }
     }
 }

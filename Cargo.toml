@@ -10,3 +10,14 @@ repository = "https://github.com/rust-clique/clap-verbosity-flag"
 [dependencies]
 log = "0.4.1"
 structopt = "0.2.8"
+
+
+[features]
+default = ["info"]
+
+quiet = []
+error = []
+warn = []
+info = []
+debug = []
+trace = []

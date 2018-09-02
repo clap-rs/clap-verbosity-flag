@@ -4,7 +4,19 @@ extern crate structopt;
 
 use log::Level;
 
+#[cfg(feature = "quiet")]
+const DEFAULT_VERBOSITY: u8 = 0;
+#[cfg(feature = "error")]
+const DEFAULT_VERBOSITY: u8 = 1;
+#[cfg(feature = "warn")]
+const DEFAULT_VERBOSITY: u8 = 2;
+#[cfg(feature = "info")]
 const DEFAULT_VERBOSITY: u8 = 3;
+#[cfg(feature = "debug")]
+const DEFAULT_VERBOSITY: u8 = 4;
+#[cfg(feature = "trace")]
+const DEFAULT_VERBOSITY: u8 = 5;
+
 const VERBOSITY_LEVELS: &'static [&'static str] =
     &["quiet", "error", "warn", "info", "debug", "trace"];
 
@@ -34,6 +46,7 @@ pub struct Verbosity {
     ///
     /// By default, it'll report errors, warnings and infos.
     /// Passing `-v` one time also prints debug, `-vv` enables trace logging.
+    #[cfg(not(feature = "trace"))]
     #[structopt(short = "v", group = "clap_verbosity_flag", parse(from_occurrences))]
     verbosity: u8,
 
@@ -51,10 +64,12 @@ pub struct Verbosity {
     /// By default, it'll report errors, warnings and infos.
     /// Passing `-q` one time disables infos, `-qq` disables warnings,
     /// `-qqq` disables errors and will print nothing,
+    #[cfg(not(feature = "quiet"))]
     #[structopt(short = "q", group = "clap_verbosity_flag", parse(from_occurrences))]
     quietness: u8,
 
     /// Disables all output
+    #[cfg(not(feature = "quiet"))]
     #[structopt(long = "quiet", group = "clap_verbosity_flag")]
     quiet: bool,
 }
@@ -62,9 +77,13 @@ pub struct Verbosity {
 impl Verbosity {
     /// Get the log level.
     pub fn log_level(&self) -> Option<Level> {
-        if self.quiet {
-            None
-        } else if let Some(level) = self.level.as_ref() {
+        #[cfg(not(feature = "quiet"))]
+        {
+            if self.quiet {
+                return None
+            }
+        }
+        if let Some(level) = self.level.as_ref() {
             match level.as_ref() {
                 "quiet" => None,
                 "error" => Some(Level::Error),
@@ -75,7 +94,14 @@ impl Verbosity {
                 _ => unreachable!(),
             }
         } else {
-            match (DEFAULT_VERBOSITY + self.verbosity).saturating_sub(self.quietness) {
+            #[cfg(feature = "quiet")]
+            let verbosity = DEFAULT_VERBOSITY + self.verbosity;
+            #[cfg(feature = "trace")]
+            let verbosity = DEFAULT_VERBOSITY.saturating_sub(self.quietness);
+            #[cfg(not(any(feature = "quiet", feature = "trace")))]
+            let verbosity = (DEFAULT_VERBOSITY + self.verbosity).saturating_sub(self.quietness);
+
+            match verbosity {
                 0 => None,
                 1 => Some(Level::Error),
                 2 => Some(Level::Warn),

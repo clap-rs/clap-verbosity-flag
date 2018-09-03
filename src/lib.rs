@@ -33,12 +33,35 @@ const VERBOSITY_LEVELS: &'static [&'static str] =
 #[derive(StructOpt, Debug, Clone)]
 pub struct Verbosity {
     /// Pass many times for less log output. see `--log-level`
+    #[cfg(feature = "log-level")]
     #[structopt(
         short = "q", long = "quiet", group = "clap_verbosity_flag", parse(from_occurrences)
     )]
     quietness: u8,
 
     /// Pass many times for more log output. see `--log-level`
+    #[cfg(feature = "log-level")]
+    #[structopt(
+        short = "v", long = "verbose", group = "clap_verbosity_flag", parse(from_occurrences)
+    )]
+    verbosity: u8,
+
+    /// Pass many times for less log output
+    ///
+    /// By default, it'll report errors, warnings and infos.
+    /// Passing `-q` one time disables infos, `-qq` disables warnings,
+    /// `-qqq` disables errors and will print nothing,
+    #[cfg(not(feature = "log-level"))]
+    #[structopt(
+        short = "q", long = "quiet", group = "clap_verbosity_flag", parse(from_occurrences)
+    )]
+    quietness: u8,
+
+    /// Pass many times for more log output
+    ///
+    /// By default, it'll report errors, warnings and infos.
+    /// Passing `-v` one time also prints debug, `-vv` enables trace logging.
+    #[cfg(not(feature = "log-level"))]
     #[structopt(
         short = "v", long = "verbose", group = "clap_verbosity_flag", parse(from_occurrences)
     )]

@@ -42,47 +42,36 @@ const VERBOSITY_LEVELS: &'static [&'static str] =
 /// ```
 #[derive(StructOpt, Debug, Clone)]
 pub struct Verbosity {
-    /// Pass many times for more log output
-    ///
-    /// By default, it'll report errors, warnings and infos.
-    /// Passing `-v` one time also prints debug, `-vv` enables trace logging.
-    #[cfg(not(feature = "trace"))]
-    #[structopt(short = "v", group = "clap_verbosity_flag", parse(from_occurrences))]
-    verbosity: u8,
-
-    /// Set verbosity
-    #[structopt(
-        long = "verbosity",
-        group = "clap_verbosity_flag",
-        raw(possible_values = "VERBOSITY_LEVELS"),
-        // parse(from_str = "parse_verbosity")
-    )]
-    level: Option<String>,
-
-    /// Pass many times for less log output
-    ///
-    /// By default, it'll report errors, warnings and infos.
-    /// Passing `-q` one time disables infos, `-qq` disables warnings,
-    /// `-qqq` disables errors and will print nothing,
+    /// Pass many times for less log output. see `--log-level`
     #[cfg(not(feature = "quiet"))]
-    #[structopt(short = "q", group = "clap_verbosity_flag", parse(from_occurrences))]
+    #[structopt(
+        short = "q", long = "quiet", group = "clap_verbosity_flag", parse(from_occurrences)
+    )]
     quietness: u8,
 
-    /// Disables all output
-    #[cfg(not(feature = "quiet"))]
-    #[structopt(long = "quiet", group = "clap_verbosity_flag")]
-    quiet: bool,
+    /// Pass many times for more log output. see `--log-level`
+    #[cfg(not(feature = "trace"))]
+    #[structopt(
+        short = "v", long = "verbose", group = "clap_verbosity_flag", parse(from_occurrences)
+    )]
+    verbosity: u8,
+
+    /// Set log level. By default it is info [possible values: quiet, error,
+    /// warn, info, debug, trace]
+    ///
+    /// Alternatively It's possible to use `-v`, `-vv` to increase and `-q`,
+    /// `-qq` etc. to decrease the log level.
+    #[structopt(
+        long = "log-level",
+        group = "clap_verbosity_flag",
+        raw(possible_values = "VERBOSITY_LEVELS", hide_possible_values = "true")
+    )]
+    level: Option<String>,
 }
 
 impl Verbosity {
     /// Get the log level.
     pub fn log_level(&self) -> Option<Level> {
-        #[cfg(not(feature = "quiet"))]
-        {
-            if self.quiet {
-                return None
-            }
-        }
         if let Some(level) = self.level.as_ref() {
             match level.as_ref() {
                 "quiet" => None,

@@ -4,19 +4,9 @@ extern crate structopt;
 
 use log::Level;
 
-#[cfg(feature = "quiet")]
-const DEFAULT_VERBOSITY: u8 = 0;
-#[cfg(feature = "error")]
-const DEFAULT_VERBOSITY: u8 = 1;
-#[cfg(feature = "warn")]
-const DEFAULT_VERBOSITY: u8 = 2;
-#[cfg(feature = "info")]
 const DEFAULT_VERBOSITY: u8 = 3;
-#[cfg(feature = "debug")]
-const DEFAULT_VERBOSITY: u8 = 4;
-#[cfg(feature = "trace")]
-const DEFAULT_VERBOSITY: u8 = 5;
 
+#[cfg(feature = "log-level")]
 const VERBOSITY_LEVELS: &'static [&'static str] =
     &["quiet", "error", "warn", "info", "debug", "trace"];
 
@@ -43,14 +33,12 @@ const VERBOSITY_LEVELS: &'static [&'static str] =
 #[derive(StructOpt, Debug, Clone)]
 pub struct Verbosity {
     /// Pass many times for less log output. see `--log-level`
-    #[cfg(not(feature = "quiet"))]
     #[structopt(
         short = "q", long = "quiet", group = "clap_verbosity_flag", parse(from_occurrences)
     )]
     quietness: u8,
 
     /// Pass many times for more log output. see `--log-level`
-    #[cfg(not(feature = "trace"))]
     #[structopt(
         short = "v", long = "verbose", group = "clap_verbosity_flag", parse(from_occurrences)
     )]
@@ -61,6 +49,7 @@ pub struct Verbosity {
     ///
     /// Alternatively It's possible to use `-v`, `-vv` to increase and `-q`,
     /// `-qq` etc. to decrease the log level.
+    #[cfg(feature = "log-level")]
     #[structopt(
         long = "log-level",
         group = "clap_verbosity_flag",
@@ -72,11 +61,15 @@ pub struct Verbosity {
 impl Verbosity {
     /// Get the log level.
     pub fn log_level(&self) -> Option<Level> {
+        #[cfg(feature = "log-level")]
         let verbosity = if let Some(level) = self.level.as_ref() {
             VERBOSITY_LEVELS.iter().position(|l| l == level).unwrap() as u8
         } else {
             self.verbosity_quietness()
         };
+        #[cfg(not(feature = "log-level"))]
+        let verbosity = self.verbosity_quietness();
+
         match verbosity {
             0 => None,
             1 => Some(Level::Error),
@@ -87,17 +80,6 @@ impl Verbosity {
         }
     }
 
-    #[cfg(feature = "quiet")]
-    fn verbosity_quietness(&self) -> u8 {
-        DEFAULT_VERBOSITY + self.verbosity
-    }
-
-    #[cfg(feature = "trace")]
-    fn verbosity_quietness(&self) -> u8 {
-        DEFAULT_VERBOSITY.saturating_sub(self.quietness)
-    }
-
-    #[cfg(not(any(feature = "quiet", feature = "trace")))]
     fn verbosity_quietness(&self) -> u8 {
         (DEFAULT_VERBOSITY + self.verbosity).saturating_sub(self.quietness)
     }

@@ -13,11 +13,6 @@ structopt = "0.2.8"
 
 
 [features]
-default = ["info"]
+default = ["log-level"]
 
-quiet = []
-error = []
-warn = []
-info = []
-debug = []
-trace = []
+log-level = []

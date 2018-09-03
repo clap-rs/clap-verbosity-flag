@@ -72,33 +72,34 @@ pub struct Verbosity {
 impl Verbosity {
     /// Get the log level.
     pub fn log_level(&self) -> Option<Level> {
-        if let Some(level) = self.level.as_ref() {
-            match level.as_ref() {
-                "quiet" => None,
-                "error" => Some(Level::Error),
-                "warn" => Some(Level::Warn),
-                "info" => Some(Level::Info),
-                "debug" => Some(Level::Debug),
-                "trace" => Some(Level::Trace),
-                _ => unreachable!(),
-            }
+        let verbosity = if let Some(level) = self.level.as_ref() {
+            VERBOSITY_LEVELS.iter().position(|l| l == level).unwrap() as u8
         } else {
-            #[cfg(feature = "quiet")]
-            let verbosity = DEFAULT_VERBOSITY + self.verbosity;
-            #[cfg(feature = "trace")]
-            let verbosity = DEFAULT_VERBOSITY.saturating_sub(self.quietness);
-            #[cfg(not(any(feature = "quiet", feature = "trace")))]
-            let verbosity = (DEFAULT_VERBOSITY + self.verbosity).saturating_sub(self.quietness);
-
-            match verbosity {
-                0 => None,
-                1 => Some(Level::Error),
-                2 => Some(Level::Warn),
-                3 => Some(Level::Info),
-                4 => Some(Level::Debug),
-                _ => Some(Level::Trace),
-            }
+            self.verbosity_quietness()
+        };
+        match verbosity {
+            0 => None,
+            1 => Some(Level::Error),
+            2 => Some(Level::Warn),
+            3 => Some(Level::Info),
+            4 => Some(Level::Debug),
+            _ => Some(Level::Trace),
         }
+    }
+
+    #[cfg(feature = "quiet")]
+    fn verbosity_quietness(&self) -> u8 {
+        DEFAULT_VERBOSITY + self.verbosity
+    }
+
+    #[cfg(feature = "trace")]
+    fn verbosity_quietness(&self) -> u8 {
+        DEFAULT_VERBOSITY.saturating_sub(self.quietness)
+    }
+
+    #[cfg(not(any(feature = "quiet", feature = "trace")))]
+    fn verbosity_quietness(&self) -> u8 {
+        (DEFAULT_VERBOSITY + self.verbosity).saturating_sub(self.quietness)
     }
 }
 

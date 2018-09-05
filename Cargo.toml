@@ -13,6 +13,8 @@ structopt = "0.2.8"
 
 
 [features]
-default = ["log-level"]
+default = ["log-level", "verbosity", "quietness"]
 
 log-level = []
+verbosity = []
+quietness = []

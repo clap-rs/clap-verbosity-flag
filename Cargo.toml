@@ -8,6 +8,10 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/rust-clique/clap-verbosity-flag"
 edition = "2018"
 
+[badges]
+azure-devops = { project = "rust-cli", pipeline = "clap-verbosity-flag" }
+codecov = { repository = "rust-cli/clap-verbosity-flag" }
+
 [dependencies]
 log = "0.4.1"
 structopt = "0.3"

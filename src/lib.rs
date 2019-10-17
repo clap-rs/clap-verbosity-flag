@@ -36,18 +36,22 @@ pub struct Verbosity {
 
 impl Verbosity {
     /// Change the default level.
-    pub fn set_default(&mut self, level: Level) {
+    ///
+    /// `None` mans all output is disabled.
+    pub fn set_default(&mut self, level: Option<Level>) {
         self.default = level_value(level);
     }
 
     /// Get the log level.
-    pub fn log_level(&self) -> Level {
+    ///
+    /// `None` mans all output is disabled.
+    pub fn log_level(&self) -> Option<Level> {
         level_enum(self.verbosity())
     }
 
     /// If the user requested complete silence (i.e. not just no-logging).
     pub fn is_silent(&self) -> bool {
-        self.verbosity() < 0
+        self.log_level().is_none()
     }
 
     fn verbosity(&self) -> i8 {
@@ -55,23 +59,25 @@ impl Verbosity {
     }
 }
 
-fn level_value(level: Level) -> i8 {
+fn level_value(level: Option<Level>) -> i8 {
     match level {
-        log::Level::Error => 0,
-        log::Level::Warn => 1,
-        log::Level::Info => 2,
-        log::Level::Debug => 3,
-        log::Level::Trace => 4,
+        None => -1,
+        Some(log::Level::Error) => 0,
+        Some(log::Level::Warn) => 1,
+        Some(log::Level::Info) => 2,
+        Some(log::Level::Debug) => 3,
+        Some(log::Level::Trace) => 4,
     }
 }
 
-fn level_enum(verbosity: i8) -> Level {
+fn level_enum(verbosity: i8) -> Option<Level> {
     match verbosity {
-        std::i8::MIN..=0 => log::Level::Error,
-        1 => log::Level::Warn,
-        2 => log::Level::Info,
-        3 => log::Level::Debug,
-        4..=std::i8::MAX => log::Level::Trace,
+        std::i8::MIN..=-1 => None,
+        0 => Some(log::Level::Error),
+        1 => Some(log::Level::Warn),
+        2 => Some(log::Level::Info),
+        3 => Some(log::Level::Debug),
+        4..=std::i8::MAX => Some(log::Level::Trace),
     }
 }
 

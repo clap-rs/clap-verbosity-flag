@@ -6,6 +6,7 @@ description = "Easily add a `--verbose` flag to CLIs using Structopt"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/rust-clique/clap-verbosity-flag"
+edition = "2018"
 
 [dependencies]
 log = "0.4.1"

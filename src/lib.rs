@@ -1,7 +1,3 @@
-extern crate log;
-#[macro_use]
-extern crate structopt;
-
 use log::Level;
 
 /// Easily add a `--verbose` flag to CLIs using Structopt
@@ -24,7 +20,7 @@ use log::Level;
 /// #
 /// # fn main() {}
 /// ```
-#[derive(StructOpt, Debug, Clone)]
+#[derive(structopt::StructOpt, Debug, Clone)]
 pub struct Verbosity {
     /// Pass many times for more log output
     ///
@@ -50,7 +46,7 @@ impl Verbosity {
 use std::fmt;
 
 impl fmt::Display for Verbosity {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.verbosity)
     }
 }

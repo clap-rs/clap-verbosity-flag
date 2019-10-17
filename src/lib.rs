@@ -24,19 +24,31 @@ pub struct Verbosity {
     /// By default, it'll only report errors. Passing `-v` one time also prints
     /// warnings, `-vv` enables info logging, `-vvv` debug, and `-vvvv` trace.
     #[structopt(long, short = "v", parse(from_occurrences))]
-    verbose: u8,
+    verbose: i8,
+
+    /// Pass many times for less log output
+    #[structopt(long, short = "q", parse(from_occurrences), conflicts_with = "verbose")]
+    quiet: i8,
 }
 
 impl Verbosity {
     /// Get the log level.
     pub fn log_level(&self) -> Level {
-        match self.verbose {
-            0 => Level::Error,
-            1 => Level::Warn,
-            2 => Level::Info,
-            3 => Level::Debug,
-            _ => Level::Trace,
+        let verbosity = 0 - self.quiet + self.verbose;
+
+        match verbosity {
+            std::i8::MIN..=0 => log::Level::Error,
+            1 => log::Level::Warn,
+            2 => log::Level::Info,
+            3 => log::Level::Debug,
+            4..=std::i8::MAX => log::Level::Trace,
         }
+    }
+
+    /// If the user requested complete silence (i.e. not just no-logging).
+    pub fn is_silent(&self) -> bool {
+        let verbosity = 0 - self.quiet + self.verbose;
+        verbosity < 0
     }
 }
 

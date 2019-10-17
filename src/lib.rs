@@ -5,9 +5,6 @@ use log::Level;
 /// # Examples
 ///
 /// ```rust
-/// extern crate clap_verbosity_flag;
-/// #[macro_use] extern crate structopt;
-///
 /// use structopt::StructOpt;
 /// use clap_verbosity_flag::Verbosity;
 ///
@@ -26,14 +23,14 @@ pub struct Verbosity {
     ///
     /// By default, it'll only report errors. Passing `-v` one time also prints
     /// warnings, `-vv` enables info logging, `-vvv` debug, and `-vvvv` trace.
-    #[structopt(long = "verbosity", short = "v", parse(from_occurrences))]
-    verbosity: u8,
+    #[structopt(long, short = "v", parse(from_occurrences))]
+    verbose: u8,
 }
 
 impl Verbosity {
     /// Get the log level.
     pub fn log_level(&self) -> Level {
-        match self.verbosity {
+        match self.verbose {
             0 => Level::Error,
             1 => Level::Warn,
             2 => Level::Info,
@@ -47,6 +44,6 @@ use std::fmt;
 
 impl fmt::Display for Verbosity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.verbosity)
+        write!(f, "{}", self.verbose)
     }
 }

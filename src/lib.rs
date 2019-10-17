@@ -1,5 +1,3 @@
-extern crate env_logger;
-extern crate failure;
 extern crate log;
 #[macro_use]
 extern crate structopt;

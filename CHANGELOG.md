@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+### Fixed
+
+- Workaround bug in structopt causing `clap-verbosity-flag`s doc-comment to win out over the caller's
+
 ## [0.3.0] - 2019-10-17
 ### Added
 - Support `.set_default_level()` for configuring the default level

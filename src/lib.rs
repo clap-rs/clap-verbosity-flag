@@ -1,22 +1,23 @@
+//! Easily add a `--verbose` flag to CLIs using Structopt
+//!
+//! # Examples
+//!
+//! ```rust
+//! use structopt::StructOpt;
+//! use clap_verbosity_flag::Verbosity;
+//!
+//! /// Le CLI
+//! #[derive(Debug, StructOpt)]
+//! struct Cli {
+//!     #[structopt(flatten)]
+//!     verbose: Verbosity,
+//! }
+//! #
+//! # fn main() {}
+//! ```
+
 use log::Level;
 
-/// Easily add a `--verbose` flag to CLIs using Structopt
-///
-/// # Examples
-///
-/// ```rust
-/// use structopt::StructOpt;
-/// use clap_verbosity_flag::Verbosity;
-///
-/// /// Le CLI
-/// #[derive(Debug, StructOpt)]
-/// struct Cli {
-///     #[structopt(flatten)]
-///     verbose: Verbosity,
-/// }
-/// #
-/// # fn main() {}
-/// ```
 #[derive(structopt::StructOpt, Debug, Clone)]
 pub struct Verbosity {
     /// Pass many times for more log output

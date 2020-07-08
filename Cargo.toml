@@ -15,3 +15,8 @@ codecov = { repository = "rust-cli/clap-verbosity-flag" }
 [dependencies]
 log = "0.4.1"
 structopt = "0.3"
+paw = { version = "1.0", optional = true }
+
+[features]
+default = []
+paw-compatibility = ["paw"]

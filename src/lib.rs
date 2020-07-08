@@ -39,8 +39,9 @@ impl Verbosity {
     /// Change the default level.
     ///
     /// `None` mans all output is disabled.
-    pub fn set_default(&mut self, level: Option<Level>) {
+    pub fn set_default(&mut self, level: Option<Level>) -> &mut Self {
         self.default = level_value(level);
+        self
     }
 
     /// Get the log level.

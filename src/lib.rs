@@ -38,14 +38,14 @@ pub struct Verbosity {
 impl Verbosity {
     /// Change the default level.
     ///
-    /// `None` mans all output is disabled.
+    /// `None` means all output is disabled.
     pub fn set_default(&mut self, level: Option<Level>) {
         self.default = level_value(level);
     }
 
     /// Get the log level.
     ///
-    /// `None` mans all output is disabled.
+    /// `None` means all output is disabled.
     pub fn log_level(&self) -> Option<Level> {
         level_enum(self.verbosity())
     }

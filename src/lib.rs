@@ -36,6 +36,14 @@ pub struct Verbosity {
 }
 
 impl Verbosity {
+    /// Create a new verbosity instance by explicitly setting the values
+    pub fn new(verbose: i8, quiet: i8, default: i8) -> Verbosity {
+        Verbosity {
+            verbose,
+            quiet,
+            default,
+        }
+    }
     /// Change the default level.
     ///
     /// `None` means all output is disabled.

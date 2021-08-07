@@ -25,11 +25,11 @@ jobs:
         override: true
     - uses: Swatinem/rust-cache@v1
     - name: Default features
-      run: cargo test --workspace
+      run: cargo test --all
     - name: All features
-      run: cargo test --workspace --all-features
+      run: cargo test --all --all-features
     - name: No-default features
-      run: cargo test --workspace --no-default-features
+      run: cargo test --all --no-default-features
   rustfmt:
     name: rustfmt
     strategy:
@@ -75,4 +75,4 @@ jobs:
     - uses: actions-rs/clippy-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        args: --workspace --all-features --all-targets -- -D warnings
+        args: --all --all-features --all-targets -- -D warnings

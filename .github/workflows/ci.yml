@@ -29,11 +29,11 @@ jobs:
         override: true
     - uses: Swatinem/rust-cache@v1
     - name: Default features
-      run: cargo check --workspace --all-targets
+      run: cargo check --all --all-targets
     - name: All features
-      run: cargo check --workspace --all-targets --all-features
+      run: cargo check --all --all-targets --all-features
     - name: No-default features
-      run: cargo check --workspace --all-targets --no-default-features
+      run: cargo check --all --all-targets --no-default-features
   test:
     name: Test
     needs: smoke
@@ -54,11 +54,11 @@ jobs:
         override: true
     - uses: Swatinem/rust-cache@v1
     - name: Default features
-      run: cargo test --workspace
+      run: cargo test --all
     - name: All features
-      run: cargo test --workspace --all-features
+      run: cargo test --all --all-features
     - name: No-default features
-      run: cargo test --workspace --no-default-features
+      run: cargo test --all --no-default-features
   msrv:
     name: "Check MSRV: 1.35.0"
     needs: smoke
@@ -74,11 +74,11 @@ jobs:
         override: true
     - uses: Swatinem/rust-cache@v1
     - name: Default features
-      run: cargo check --workspace --all-targets
+      run: cargo check --all --all-targets
     - name: All features
-      run: cargo check --workspace --all-targets --all-features
+      run: cargo check --all --all-targets --all-features
     - name: No-default features
-      run: cargo check --workspace --all-targets --no-default-features
+      run: cargo check --all --all-targets --no-default-features
   docs:
     name: Docs
     needs: smoke
@@ -96,7 +96,7 @@ jobs:
     - name: Check documentation
       env:
         RUSTDOCFLAGS: -D warnings
-      run: cargo doc --no-deps --document-private-items --workspace
+      run: cargo doc --no-deps --document-private-items --all
   rustfmt:
     name: rustfmt
     runs-on: ubuntu-latest
@@ -130,4 +130,4 @@ jobs:
     - uses: actions-rs/clippy-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        args: --workspace --all-features --all-targets -- -D warnings
+        args: --all --all-features --all-targets -- -D warnings

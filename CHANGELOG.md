@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Allow instantiating the struct
+
 ## [0.3.1] - 2020-01-16
 
 ### Fixed

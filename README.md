@@ -1,6 +1,5 @@
 # clap-verbosity-flag
 
-[![Build Status](https://dev.azure.com/rust-cli/rust-cli/_apis/build/status/clap-verbosity-flag?branchName=master)](https://dev.azure.com/rust-cli/rust-cli/_build/latest?definitionId=1&branchName=master)
 [![Documentation](https://img.shields.io/badge/docs-master-blue.svg)][Documentation]
 ![License](https://img.shields.io/crates/l/clap-verbosity-flag.svg)
 [![crates.io](https://img.shields.io/crates/v/clap-verbosity-flag.svg)][Crates.io]

@@ -1,5 +1,13 @@
 name: rust-next
 on:
+  push:
+    branches:
+    - master
+    paths:
+    - '**'
+    - '!/*.md'
+    - '!/docs/**'
+    - "!/LICENSE-*"
   schedule:
   - cron: '3 3 3 * *'
 jobs:
@@ -25,11 +33,11 @@ jobs:
         override: true
     - uses: Swatinem/rust-cache@v1
     - name: Default features
-      run: cargo test --all
+      run: cargo test --workspace
     - name: All features
-      run: cargo test --all --all-features
+      run: cargo test --workspace --all-features
     - name: No-default features
-      run: cargo test --all --no-default-features
+      run: cargo test --workspace --no-default-features
   rustfmt:
     name: rustfmt
     strategy:
@@ -75,4 +83,4 @@ jobs:
     - uses: actions-rs/clippy-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        args: --all --all-features --all-targets -- -D warnings
+        args: --workspace --all-features --all-targets -- -D warnings

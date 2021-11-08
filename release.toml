@@ -1,5 +1,5 @@
 pre-release-commit-message = "chore: Release"
-no-dev-version = true
+dev-version = false
 consolidate-commits = true
 consolidate-pushes = true
 allow-branch = ["master"]

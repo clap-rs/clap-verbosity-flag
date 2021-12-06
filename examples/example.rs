@@ -1,13 +1,13 @@
+use clap::Parser;
 use clap_verbosity_flag::Verbosity;
-use structopt::StructOpt;
 
 /// Foo
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 struct Cli {
-    #[structopt(flatten)]
+    #[clap(flatten)]
     verbose: Verbosity,
 }
 
 fn main() {
-    Cli::from_args();
+    Cli::parse();
 }

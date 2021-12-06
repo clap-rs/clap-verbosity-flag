@@ -3,13 +3,13 @@
 //! # Examples
 //!
 //! ```rust
-//! use structopt::StructOpt;
+//! use clap::Parser;
 //! use clap_verbosity_flag::Verbosity;
 //!
 //! /// Le CLI
-//! #[derive(Debug, StructOpt)]
+//! #[derive(Debug, Parser)]
 //! struct Cli {
-//!     #[structopt(flatten)]
+//!     #[clap(flatten)]
 //!     verbose: Verbosity,
 //! }
 //! #
@@ -18,20 +18,20 @@
 
 use log::Level;
 
-#[derive(structopt::StructOpt, Debug, Clone)]
+#[derive(clap::Args, Debug, Clone)]
 pub struct Verbosity {
     /// Pass many times for more log output
     ///
     /// By default, it'll only report errors. Passing `-v` one time also prints
     /// warnings, `-vv` enables info logging, `-vvv` debug, and `-vvvv` trace.
-    #[structopt(long, short = "v", parse(from_occurrences))]
+    #[clap(long, short = 'v', parse(from_occurrences))]
     verbose: i8,
 
     /// Pass many times for less log output
-    #[structopt(long, short = "q", parse(from_occurrences), conflicts_with = "verbose")]
+    #[clap(long, short = 'q', parse(from_occurrences), conflicts_with = "verbose")]
     quiet: i8,
 
-    #[structopt(skip)]
+    #[clap(skip)]
     default: i8,
 }
 
@@ -95,5 +95,22 @@ use std::fmt;
 impl fmt::Display for Verbosity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.verbose)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn verify_app() {
+        #[derive(Debug, clap::StructOpt)]
+        struct Cli {
+            #[clap(flatten)]
+            verbose: Verbosity,
+        }
+
+        use clap::IntoApp;
+        Cli::into_app().debug_assert()
     }
 }

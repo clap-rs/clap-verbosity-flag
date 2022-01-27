@@ -8,17 +8,17 @@
 [Crates.io]: https://crates.io/crates/clap-verbosity-flag
 [Documentation]: https://docs.rs/clap-verbosity-flag/
 
-Easily add a `--verbose` flag to CLIs using Structopt
+Easily add a `--verbose` flag to CLIs using clap
 
 ## Examples
 
 ```rust
-extern crate clap_verbosity_flag;
+use clap::Parser;
 
 // ...
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 struct Cli {
-    #[structopt(flatten)]
+    #[clap(flatten)]
     verbose: clap_verbosity_flag::Verbosity,
 }
 ```

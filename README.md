@@ -4,30 +4,30 @@
 ![License](https://img.shields.io/crates/l/clap-verbosity-flag.svg)
 [![crates.io](https://img.shields.io/crates/v/clap-verbosity-flag.svg)][Crates.io]
 
-[Travis]: https://travis-ci.org/rust-cli/clap-verbosity-flag
 [Crates.io]: https://crates.io/crates/clap-verbosity-flag
 [Documentation]: https://docs.rs/clap-verbosity-flag/
 
-Easily add a `--verbose` flag to CLIs using Structopt
+Easily add a `--verbose` flag to CLIs using clap
 
 ## Examples
 
 ```rust
-extern crate clap_verbosity_flag;
+use clap::Parser;
 
 // ...
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 struct Cli {
-    #[structopt(flatten)]
+    #[clap(flatten)]
     verbose: clap_verbosity_flag::Verbosity,
 }
 ```
 
 By default, it'll only report errors.
-Passing `-v` one time also prints warnings,
-`-vv` enables info logging,
-`-vvv` debug,
-and `-vvvv` trace.
+- `-q` silences output
+- `-v` show warnings
+- `-vv` show info
+- `-vvv` show debug
+- `-vvvv` show trace
 
 ## License
 

@@ -2,7 +2,7 @@
 //!
 //! # Examples
 //!
-//! ```rust
+//! ```rust,no_run
 //! use clap::Parser;
 //! use clap_verbosity_flag::Verbosity;
 //!
@@ -12,11 +12,22 @@
 //!     #[clap(flatten)]
 //!     verbose: Verbosity,
 //! }
-//! #
-//! # fn main() {}
+//!
+//! let cli = Cli::parse();
+//! env_logger::Builder::new()
+//!     .filter_level(cli.verbose.log_level_filter())
+//!     .init();
 //! ```
+//!
+//! This will only report errors.
+//! - `-q` silences output
+//! - `-v` show warnings
+//! - `-vv` show info
+//! - `-vvv` show debug
+//! - `-vvvv` show trace
 
 use log::Level;
+use log::LevelFilter;
 
 #[derive(clap::Args, Debug, Clone)]
 pub struct Verbosity {
@@ -44,7 +55,11 @@ impl Verbosity {
             default,
         }
     }
+
     /// Change the default level.
+    ///
+    /// When the level is lower than `log::Error` (the default), multiple `-q`s will be needed for
+    /// complete silence
     ///
     /// `None` means all output is disabled.
     pub fn set_default(&mut self, level: Option<Level>) {
@@ -56,6 +71,13 @@ impl Verbosity {
     /// `None` means all output is disabled.
     pub fn log_level(&self) -> Option<Level> {
         level_enum(self.verbosity())
+    }
+
+    /// Get the log level filter.
+    pub fn log_level_filter(&self) -> LevelFilter {
+        level_enum(self.verbosity())
+            .map(|l| l.to_level_filter())
+            .unwrap_or(log::LevelFilter::Off)
     }
 
     /// If the user requested complete silence (i.e. not just no-logging).
@@ -94,7 +116,7 @@ use std::fmt;
 
 impl fmt::Display for Verbosity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.verbose)
+        write!(f, "{}", self.verbosity())
     }
 }
 

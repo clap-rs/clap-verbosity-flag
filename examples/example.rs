@@ -9,5 +9,9 @@ struct Cli {
 }
 
 fn main() {
-    Cli::parse();
+    let cli = Cli::parse();
+
+    env_logger::Builder::new()
+        .filter_level(cli.verbose.log_level_filter())
+        .init();
 }

@@ -4,7 +4,6 @@
 ![License](https://img.shields.io/crates/l/clap-verbosity-flag.svg)
 [![crates.io](https://img.shields.io/crates/v/clap-verbosity-flag.svg)][Crates.io]
 
-[Travis]: https://travis-ci.org/rust-cli/clap-verbosity-flag
 [Crates.io]: https://crates.io/crates/clap-verbosity-flag
 [Documentation]: https://docs.rs/clap-verbosity-flag/
 

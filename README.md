@@ -23,10 +23,11 @@ struct Cli {
 ```
 
 By default, it'll only report errors.
-Passing `-v` one time also prints warnings,
-`-vv` enables info logging,
-`-vvv` debug,
-and `-vvvv` trace.
+- `-q` silences output
+- `-v` show warnings
+- `-vv` show info
+- `-vvv` show debug
+- `-vvvv` show trace
 
 ## License
 

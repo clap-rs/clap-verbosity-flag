@@ -14,14 +14,13 @@
 //! }
 //!
 //! let cli = Cli::parse();
-//! if let Some(level) = cli.verbose.log_level() {
-//!     env_logger::Builder::new()
-//!         .filter_level(level.to_level_filter())
-//!         .init();
-//! }
+//! env_logger::Builder::new()
+//!     .filter_level(cli.verbose.log_level_filter())
+//!     .init();
 //! ```
 
 use log::Level;
+use log::LevelFilter;
 
 #[derive(clap::Args, Debug, Clone)]
 pub struct Verbosity {
@@ -61,6 +60,13 @@ impl Verbosity {
     /// `None` means all output is disabled.
     pub fn log_level(&self) -> Option<Level> {
         level_enum(self.verbosity())
+    }
+
+    /// Get the log level filter.
+    pub fn log_level_filter(&self) -> LevelFilter {
+        level_enum(self.verbosity())
+            .map(|l| l.to_level_filter())
+            .unwrap_or(log::LevelFilter::Off)
     }
 
     /// If the user requested complete silence (i.e. not just no-logging).

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Features
+
+- Added `log_level_filter` for convenience
+
+### Fixes
+
+- `Display` now shows the combination of quiet and verbose
+- Improved examples in documentation
+
 ## [0.4.0] - 2021-12-31
 
 ### Breaking Changes

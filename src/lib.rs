@@ -105,7 +105,7 @@ use std::fmt;
 
 impl fmt::Display for Verbosity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.verbose)
+        write!(f, "{}", self.verbosity())
     }
 }
 

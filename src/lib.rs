@@ -35,11 +35,17 @@ pub struct Verbosity {
     ///
     /// By default, it'll only report errors. Passing `-v` one time also prints
     /// warnings, `-vv` enables info logging, `-vvv` debug, and `-vvvv` trace.
-    #[clap(long, short = 'v', parse(from_occurrences))]
+    #[clap(long, short = 'v', parse(from_occurrences), global = true)]
     verbose: i8,
 
     /// Pass many times for less log output
-    #[clap(long, short = 'q', parse(from_occurrences), conflicts_with = "verbose")]
+    #[clap(
+        long,
+        short = 'q',
+        parse(from_occurrences),
+        global = true,
+        conflicts_with = "verbose"
+    )]
     quiet: i8,
 
     #[clap(skip)]

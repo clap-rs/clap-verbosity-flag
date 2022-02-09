@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Breaking Changes
+
+- `set_default`has been removed in favor of being generic over `LogLevel`.
+- `--verbose` and `--quiet` are now global
+
+### Features
+
+- Allow customizing help text
+
+### Fixes
+
+- `--verbose` and `--quiet` are now global
+
 ## [0.4.1] - 2022-01-27
 
 ### Features

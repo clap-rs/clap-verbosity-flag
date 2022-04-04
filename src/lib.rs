@@ -205,7 +205,7 @@ mod test {
             verbose: Verbosity,
         }
 
-        use clap::IntoApp;
-        Cli::into_app().debug_assert()
+        use clap::CommandFactory;
+        Cli::command().debug_assert()
     }
 }

@@ -92,14 +92,22 @@ impl<L: LogLevel> Verbosity<L> {
         }
     }
 
-    /// Get the log level.
+    /// Get the log level, as defined by the `log` crate.
     ///
     /// `None` means all output is disabled.
     pub fn log_level(&self) -> Option<log::Level> {
         level_enum(self.verbosity())
     }
 
-    /// Get the log level filter.
+    /// Get the log level, as defined by the `tracing` crate.
+    ///
+    /// `None` means all output is disabled.
+    #[cfg(feature = "tracing")]
+    pub fn tracing_level(&self) -> Option<tracing::Level> {
+        self.log_level().map(tracing_level_from_log_level)
+    }
+
+    /// Get the log level filter, as defined by the `log` crate.
     pub fn log_level_filter(&self) -> log::LevelFilter {
         level_enum(self.verbosity())
             .map(|l| l.to_level_filter())
@@ -135,6 +143,17 @@ fn level_enum(verbosity: i8) -> Option<log::Level> {
         2 => Some(log::Level::Info),
         3 => Some(log::Level::Debug),
         4..=std::i8::MAX => Some(log::Level::Trace),
+    }
+}
+
+#[cfg(feature = "tracing")]
+fn tracing_level_from_log_level(level: log::Level) -> tracing::Level {
+    match level {
+        log::Level::Error => tracing::Level::ERROR,
+        log::Level::Warn => tracing::Level::WARN,
+        log::Level::Info => tracing::Level::INFO,
+        log::Level::Debug => tracing::Level::DEBUG,
+        log::Level::Trace => tracing::Level::TRACE,
     }
 }
 

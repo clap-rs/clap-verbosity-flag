@@ -30,6 +30,7 @@ codecov = { repository = "rust-cli/clap-verbosity-flag" }
 [dependencies]
 log = "0.4.1"
 clap = { version = "3.0", default-features = false, features = ["std", "derive"] }
+tracing = { version = "0.1", default-features = false, optional = true }
 
 [dev-dependencies]
 env_logger = "0.9.0"

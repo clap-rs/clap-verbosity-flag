@@ -6,7 +6,8 @@ authors = ["Pascal Hertleif <killercup@gmail.com>"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/rust-clique/clap-verbosity-flag"
 readme = "README.md"
-edition = "2018"
+edition = "2021"
+rust-version = "1.56.0"  # MSRV
 include = [
   "src/**/*",
   "Cargo.toml",

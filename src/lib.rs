@@ -1,4 +1,4 @@
-//! Easily add a `--verbose` flag to CLIs using Structopt
+//! Control `log` level with a `--verbose` flag for your CLI
 //!
 //! # Examples
 //!

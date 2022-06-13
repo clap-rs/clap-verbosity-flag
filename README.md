@@ -1,4 +1,4 @@
-# clap-verbosity-flag
+# clap-verbosity-flag for `log`
 
 [![Documentation](https://img.shields.io/badge/docs-master-blue.svg)][Documentation]
 ![License](https://img.shields.io/crates/l/clap-verbosity-flag.svg)

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Fixes
+
+- Clarify relationship with `log`
+
 ## [1.0.0] - 2022-02-09
 
 ### Breaking Changes

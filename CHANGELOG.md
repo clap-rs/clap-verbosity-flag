@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.0.0] - 2022-09-28
+
 ### Breaking Changes
 
 - Upgraded to clap v4
@@ -80,7 +82,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2017-06-02
 
 <!-- next-url -->
-[Unreleased]: https://github.com/rust-cli/clap-verbosity-flag/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/rust-cli/clap-verbosity-flag/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/rust-cli/clap-verbosity-flag/compare/v1.0.1...v2.0.0
 [1.0.1]: https://github.com/rust-cli/clap-verbosity-flag/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/rust-cli/clap-verbosity-flag/compare/v0.4.1...v1.0.0
 [0.4.1]: https://github.com/rust-cli/clap-verbosity-flag/compare/v0.4.0...v0.4.1

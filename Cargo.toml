@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/rust-clique/clap-verbosity-flag"
 readme = "README.md"
 edition = "2021"
-rust-version = "1.56.1"  # MSRV
+rust-version = "1.60.0"  # MSRV
 include = [
   "src/**/*",
   "Cargo.toml",
@@ -30,7 +30,7 @@ codecov = { repository = "rust-cli/clap-verbosity-flag" }
 
 [dependencies]
 log = "0.4.1"
-clap = { version = "3.0", default-features = false, features = ["std", "derive"] }
+clap = { version = "4.0.0", default-features = false, features = ["std", "derive"] }
 
 [dev-dependencies]
 env_logger = "0.9.0"

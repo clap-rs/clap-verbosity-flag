@@ -11,7 +11,7 @@
 //! # /// Le CLI
 //! # #[derive(Debug, Parser)]
 //! # struct Cli {
-//! #[clap(flatten)]
+//! #[command(flatten)]
 //! verbose: Verbosity,
 //! # }
 //! ```
@@ -24,7 +24,7 @@
 //! # /// Le CLI
 //! # #[derive(Debug, Parser)]
 //! # struct Cli {
-//! #     #[clap(flatten)]
+//! #     #[command(flatten)]
 //! #     verbose: Verbosity,
 //! # }
 //! let cli = Cli::parse();
@@ -48,7 +48,7 @@
 //! /// Le CLI
 //! #[derive(Debug, Parser)]
 //! struct Cli {
-//!     #[clap(flatten)]
+//!     #[command(flatten)]
 //!     verbose: Verbosity<InfoLevel>,
 //! }
 //! ```
@@ -57,34 +57,34 @@
 
 #[derive(clap::Args, Debug, Clone)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
-    #[clap(
+    #[arg(
         long,
         short = 'v',
-        parse(from_occurrences),
+        action = clap::ArgAction::Count,
         global = true,
         help = L::verbose_help(),
         long_help = L::verbose_long_help(),
     )]
-    verbose: i8,
+    verbose: u8,
 
-    #[clap(
+    #[arg(
         long,
         short = 'q',
-        parse(from_occurrences),
+        action = clap::ArgAction::Count,
         global = true,
         help = L::quiet_help(),
         long_help = L::quiet_long_help(),
         conflicts_with = "verbose",
     )]
-    quiet: i8,
+    quiet: u8,
 
-    #[clap(skip)]
+    #[arg(skip)]
     phantom: std::marker::PhantomData<L>,
 }
 
 impl<L: LogLevel> Verbosity<L> {
     /// Create a new verbosity instance by explicitly setting the values
-    pub fn new(verbose: i8, quiet: i8) -> Self {
+    pub fn new(verbose: u8, quiet: u8) -> Self {
         Verbosity {
             verbose,
             quiet,
@@ -112,7 +112,7 @@ impl<L: LogLevel> Verbosity<L> {
     }
 
     fn verbosity(&self) -> i8 {
-        level_value(L::default()) - self.quiet + self.verbose
+        level_value(L::default()) - (self.quiet as i8) + (self.verbose as i8)
     }
 }
 

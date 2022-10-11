@@ -96,14 +96,28 @@ impl<L: LogLevel> Verbosity<L> {
     ///
     /// `None` means all output is disabled.
     pub fn log_level(&self) -> Option<log::Level> {
-        level_enum(self.verbosity())
+        log_level_enum(self.verbosity())
     }
 
     /// Get the log level filter.
     pub fn log_level_filter(&self) -> log::LevelFilter {
-        level_enum(self.verbosity())
+        log_level_enum(self.verbosity())
             .map(|l| l.to_level_filter())
             .unwrap_or(log::LevelFilter::Off)
+    }
+
+    /// Get the tracing level.
+    ///
+    /// `None` means all output is disabled.
+    pub fn tracing_level(&self) -> Option<tracing::Level> {
+        tracing_level_enum(self.verbosity())
+    }
+
+    /// Get the tracing level filter.
+    pub fn tracing_level_filter(&self) -> tracing::level_filters::LevelFilter {
+        tracing_level_enum(self.verbosity())
+            .map(|l| tracing::level_filters::LevelFilter::from_level(l))
+            .unwrap_or(tracing::level_filters::LevelFilter::OFF)
     }
 
     /// If the user requested complete silence (i.e. not just no-logging).
@@ -127,7 +141,7 @@ fn level_value(level: Option<log::Level>) -> i8 {
     }
 }
 
-fn level_enum(verbosity: i8) -> Option<log::Level> {
+fn log_level_enum(verbosity: i8) -> Option<log::Level> {
     match verbosity {
         std::i8::MIN..=-1 => None,
         0 => Some(log::Level::Error),
@@ -135,6 +149,17 @@ fn level_enum(verbosity: i8) -> Option<log::Level> {
         2 => Some(log::Level::Info),
         3 => Some(log::Level::Debug),
         4..=std::i8::MAX => Some(log::Level::Trace),
+    }
+}
+
+fn tracing_level_enum(verbosity: i8) -> Option<tracing::Level> {
+    match verbosity {
+        std::i8::MIN..=-1 => None,
+        0 => Some(tracing::Level::ERROR),
+        1 => Some(tracing::Level::WARN),
+        2 => Some(tracing::Level::INFO),
+        3 => Some(tracing::Level::DEBUG),
+        4..=std::i8::MAX => Some(tracing::Level::TRACE),
     }
 }
 

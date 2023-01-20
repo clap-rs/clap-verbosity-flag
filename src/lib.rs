@@ -111,7 +111,8 @@ impl<L: LogLevel> Verbosity<L> {
         self.log_level().is_none()
     }
 
-    fn verbosity(&self) -> i8 {
+    // The raw i8 value of the combined verbosity level
+    pub fn verbosity(&self) -> i8 {
         level_value(L::default()) - (self.quiet as i8) + (self.verbose as i8)
     }
 }

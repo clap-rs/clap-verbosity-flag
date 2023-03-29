@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Features
+
+- Re-export enums from `log`
+
 ## [2.0.0] - 2022-09-28
 
 ### Breaking Changes

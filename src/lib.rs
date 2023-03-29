@@ -55,6 +55,9 @@
 //!
 //! Or implement [`LogLevel`] yourself for more control.
 
+pub use log::Level;
+pub use log::LevelFilter;
+
 #[derive(clap::Args, Debug, Clone)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(

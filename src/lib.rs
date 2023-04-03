@@ -55,6 +55,8 @@
 //!
 //! Or implement [`LogLevel`] yourself for more control.
 
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
 pub use log::Level;
 pub use log::LevelFilter;
 

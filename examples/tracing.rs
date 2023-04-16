@@ -5,7 +5,7 @@ use tracing_log::AsTrace;
 /// Foo
 #[derive(Debug, Parser)]
 struct Cli {
-    #[clap(flatten)]
+    #[command(flatten)]
     verbose: Verbosity,
 }
 

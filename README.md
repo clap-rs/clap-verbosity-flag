@@ -17,7 +17,7 @@ use clap::Parser;
 // ...
 #[derive(Debug, Parser)]
 struct Cli {
-    #[clap(flatten)]
+    #[command(flatten)]
     verbose: clap_verbosity_flag::Verbosity,
 }
 ```

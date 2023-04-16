@@ -1,9 +1,9 @@
 # These settings are synced to GitHub by https://probot.github.io/apps/settings/
 
 repository:
-  description: "Easily add a --verbose flag to CLIs using Structopt"
+  description: "Easily add a --verbose flag to CLIs using Clap"
   homepage: "https://docs.rs/clap-verbosity-flag"
-  topics: "rust cli logging"
+  topics: "rust cli clap logging"
   has_issues: true
   has_projects: false
   has_wiki: false

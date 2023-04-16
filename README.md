@@ -7,7 +7,7 @@
 [Crates.io]: https://crates.io/crates/clap-verbosity-flag
 [Documentation]: https://docs.rs/clap-verbosity-flag/
 
-Easily add a `--verbose` flag to CLIs using clap
+Easily add a `--verbose` flag to CLIs using Clap
 
 ## Examples
 
@@ -17,7 +17,7 @@ use clap::Parser;
 // ...
 #[derive(Debug, Parser)]
 struct Cli {
-    #[clap(flatten)]
+    #[command(flatten)]
     verbose: clap_verbosity_flag::Verbosity,
 }
 ```

@@ -4,7 +4,7 @@ use clap_verbosity_flag::Verbosity;
 /// Foo
 #[derive(Debug, Parser)]
 struct Cli {
-    #[clap(flatten)]
+    #[command(flatten)]
     verbose: Verbosity,
 }
 

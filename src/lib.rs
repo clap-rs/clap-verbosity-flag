@@ -206,7 +206,7 @@ mod test {
     fn verify_app() {
         #[derive(Debug, clap::Parser)]
         struct Cli {
-            #[clap(flatten)]
+            #[command(flatten)]
             verbose: Verbosity,
         }
 

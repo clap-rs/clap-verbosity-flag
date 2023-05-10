@@ -47,9 +47,13 @@ codecov = { repository = "clap-rs/clap-verbosity-flag" }
 [dependencies]
 log = "0.4.1"
 clap = { version = "4.0.0", default-features = false, features = ["std", "derive"] }
+serde = { version = "1.0.26", features = ["derive"], optional = true }
 
 [dev-dependencies]
 env_logger = "0.10.0"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 tracing-log = "0.1"
+
+[features]
+serde = ["dep:serde"]

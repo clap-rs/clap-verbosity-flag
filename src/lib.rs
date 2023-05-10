@@ -60,6 +60,10 @@
 pub use log::Level;
 pub use log::LevelFilter;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(clap::Args, Debug, Clone)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(
@@ -83,6 +87,7 @@ pub struct Verbosity<L: LogLevel = ErrorLevel> {
     )]
     quiet: u8,
 
+    #[cfg_attr(feature = "serde", serde(skip))]
     #[arg(skip)]
     phantom: std::marker::PhantomData<L>,
 }

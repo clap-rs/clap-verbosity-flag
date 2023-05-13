@@ -60,10 +60,7 @@
 pub use log::Level;
 pub use log::LevelFilter;
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(clap::Args, Debug, Clone)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(

@@ -116,7 +116,9 @@ impl<L: LogLevel> Verbosity<L> {
         self.log_level().is_none()
     }
 
-    fn verbosity(&self) -> i8 {
+    /// Returns the verbosity as a integer number
+    /// (can be used for custom verbosity levels beyond the strongly typed log levels)
+    pub fn verbosity(&self) -> i8 {
         level_value(L::default()) - (self.quiet as i8) + (self.verbose as i8)
     }
 }

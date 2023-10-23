@@ -60,7 +60,7 @@
 pub use log::Level;
 pub use log::LevelFilter;
 
-#[derive(clap::Args, Debug, Clone)]
+#[derive(clap::Args, Debug, Clone, Default)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(
         long,

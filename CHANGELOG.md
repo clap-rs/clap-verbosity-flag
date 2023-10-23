@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.1.0] - 2023-10-23
+
 ### Compatibility
 
 - Raised MSRV to 1.70.0
@@ -96,7 +98,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2017-06-02
 
 <!-- next-url -->
-[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/clap-rs/clap-verbosity-flag/compare/v1.0.1...v2.0.0
 [1.0.1]: https://github.com/clap-rs/clap-verbosity-flag/compare/v1.0.0...v1.0.1

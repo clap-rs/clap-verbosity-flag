@@ -157,7 +157,7 @@ pub trait LogLevel {
     fn default() -> Option<log::Level>;
 
     fn verbose_help() -> Option<&'static str> {
-        Some("More output per occurrence")
+        Some("Increase logging verbosity")
     }
 
     fn verbose_long_help() -> Option<&'static str> {
@@ -165,7 +165,7 @@ pub trait LogLevel {
     }
 
     fn quiet_help() -> Option<&'static str> {
-        Some("Less output per occurrence")
+        Some("Decrease logging verbosity")
     }
 
     fn quiet_long_help() -> Option<&'static str> {

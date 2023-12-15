@@ -53,7 +53,7 @@
 //! }
 //! ```
 //!
-//! Or implement out [`LogLevel`] trait to customize the default log level and help output.
+//! Or implement our [`LogLevel`] trait to customize the default log level and help output.
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 

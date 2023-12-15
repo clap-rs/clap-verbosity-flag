@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Fixes
+
+- Tried to clarify help output for `-v` / `-q`
+
+### Documentation
+
+- Tried to clarify role of `LogLevel` trait
+
 ## [2.1.0] - 2023-10-23
 
 ### Compatibility

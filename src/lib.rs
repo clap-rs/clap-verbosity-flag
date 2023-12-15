@@ -53,13 +53,14 @@
 //! }
 //! ```
 //!
-//! Or implement [`LogLevel`] yourself for more control.
+//! Or implement out [`LogLevel`] trait to customize the default log level and help output.
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub use log::Level;
 pub use log::LevelFilter;
 
+/// Logging flags to `#[command(flatte)]` into your CLI
 #[derive(clap::Args, Debug, Clone, Default)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(
@@ -151,6 +152,7 @@ impl<L: LogLevel> fmt::Display for Verbosity<L> {
     }
 }
 
+/// Customize the default log-level and associated help
 pub trait LogLevel {
     fn default() -> Option<log::Level>;
 
@@ -171,6 +173,7 @@ pub trait LogLevel {
     }
 }
 
+/// Default to [`log::Level::Error`]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct ErrorLevel;
 
@@ -180,6 +183,7 @@ impl LogLevel for ErrorLevel {
     }
 }
 
+/// Default to [`log::Level::Warn`]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct WarnLevel;
 
@@ -189,6 +193,7 @@ impl LogLevel for WarnLevel {
     }
 }
 
+/// Default to [`log::Level::Info`]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct InfoLevel;
 

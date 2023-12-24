@@ -203,6 +203,26 @@ impl LogLevel for InfoLevel {
     }
 }
 
+/// Default to [`log::Level::Debug`]
+#[derive(Copy, Clone, Debug, Default)]
+pub struct DebugLevel;
+
+impl LogLevel for DebugLevel {
+    fn default() -> Option<log::Level> {
+        Some(log::Level::Debug)
+    }
+}
+
+/// Default to [`log::Level::Trace`]
+#[derive(Copy, Clone, Debug, Default)]
+pub struct TraceLevel;
+
+impl LogLevel for TraceLevel {
+    fn default() -> Option<log::Level> {
+        Some(log::Level::Trace)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

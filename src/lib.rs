@@ -60,7 +60,6 @@
 pub use log::Level;
 pub use log::LevelFilter;
 
-/// Logging flags to `#[command(flatten)]` into your CLI
 #[derive(clap::Args, Debug, Clone, Default)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(

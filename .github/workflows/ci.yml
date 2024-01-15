@@ -30,6 +30,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
+        logger: ["log", "tracing"]
     continue-on-error: ${{ matrix.rust != 'stable' }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -41,15 +42,16 @@ jobs:
         toolchain: ${{ matrix.rust }}
     - uses: Swatinem/rust-cache@v2
     - name: Build
-      run: cargo test --no-run --workspace --all-features
+      run: cargo test --no-run --workspace --no-default-features --features ${{ matrix.logger }}
     - name: Default features
       run: cargo test --workspace
-    - name: All features
-      run: cargo test --workspace --all-features
-    - name: No-default features
-      run: cargo test --workspace --no-default-features
+    - name: Feature ${{ matrix.logger }}
+      run: cargo test --workspace --no-default-features --features ${{ matrix.logger }}
   msrv:
     name: "Check MSRV: 1.70"
+    strategy:
+      matrix:
+        logger: ["log", "tracing"]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -61,10 +63,8 @@ jobs:
     - uses: Swatinem/rust-cache@v2
     - name: Default features
       run: cargo check --workspace --all-targets
-    - name: All features
-      run: cargo check --workspace --all-targets --all-features
-    - name: No-default features
-      run: cargo check --workspace --all-targets --no-default-features
+    - name: Feature ${{ matrix.logger }}
+      run: cargo check --workspace --all-targets --no-default-features --features ${{ matrix.logger }}
   lockfile:
     runs-on: ubuntu-latest
     steps:
@@ -91,7 +91,7 @@ jobs:
     - name: Check documentation
       env:
         RUSTDOCFLAGS: -D warnings
-      run: cargo doc --workspace --all-features --no-deps --document-private-items
+      run: cargo doc --workspace --no-deps --document-private-items
   rustfmt:
     name: rustfmt
     runs-on: ubuntu-latest
@@ -111,6 +111,9 @@ jobs:
   clippy:
     name: clippy
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        logger: ["log", "tracing"]
     permissions:
       security-events: write # to upload sarif results
     steps:
@@ -128,7 +131,7 @@ jobs:
       run: cargo install sarif-fmt --version 0.3.4 --locked # Held back due to msrv
     - name: Check
       run: >
-        cargo clippy --workspace --all-features --all-targets --message-format=json -- -D warnings --allow deprecated
+        cargo clippy --workspace --no-default-features --features ${{ matrix.logger }} --all-targets --message-format=json -- -D warnings --allow deprecated
         | clippy-sarif
         | tee clippy-results.sarif
         | sarif-fmt
@@ -139,4 +142,4 @@ jobs:
         sarif_file: clippy-results.sarif
         wait-for-processing: true
     - name: Report status
-      run: cargo clippy --workspace --all-features --all-targets -- -D warnings --allow deprecated
+      run: cargo clippy --workspace --no-default-features --features ${{ matrix.logger }} --all-targets -- -D warnings --allow deprecated

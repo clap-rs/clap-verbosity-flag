@@ -1,3 +1,4 @@
+
 use clap::Parser;
 use clap_verbosity_flag::Verbosity;
 
@@ -8,6 +9,7 @@ struct Cli {
     verbose: Verbosity,
 }
 
+#[cfg(feature = "log")]
 fn main() {
     let cli = Cli::parse();
 
@@ -21,3 +23,6 @@ fn main() {
     log::debug!("Engine temperature is 200 degrees");
     log::trace!("Engine subsection is 300 degrees");
 }
+
+#[cfg(not(feature = "log"))]
+fn main() {}

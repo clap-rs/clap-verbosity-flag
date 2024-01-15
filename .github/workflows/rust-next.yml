@@ -19,6 +19,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable", "beta"]
+        logger: ["log", "tracing"]
         include:
         - os: ubuntu-latest
           rust: "nightly"
@@ -34,12 +35,13 @@ jobs:
     - uses: Swatinem/rust-cache@v2
     - name: Default features
       run: cargo test --workspace
-    - name: All features
-      run: cargo test --workspace --all-features
-    - name: No-default features
-      run: cargo test --workspace --no-default-features
+    - name: Features ${{ matrix.logger }}
+      run: cargo test --workspace --no-default-features --features ${{ matrix.logger }}
   latest:
     name: "Check latest dependencies"
+    strategy:
+      matrix:
+        logger: ["log", "tracing"]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -53,7 +55,5 @@ jobs:
       run: cargo update
     - name: Default features
       run: cargo test --workspace --all-targets
-    - name: All features
-      run: cargo test --workspace --all-targets --all-features
-    - name: No-default features
-      run: cargo test --workspace --all-targets --no-default-features
+    - name: Feature ${{ matrix.logger }}
+      run: cargo test --workspace --all-targets --no-default-features --features ${{ matrix.logger }}

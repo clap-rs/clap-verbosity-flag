@@ -99,6 +99,12 @@ impl<L: LogLevel> Verbosity<L> {
         }
     }
 
+    /// Whether any verbosity flags (either `--verbose` or `--quiet`)
+    /// are present on the command line.
+    pub fn is_present(&self) -> bool {
+        self.verbose != 0 || self.quiet != 0
+    }
+
     /// Get the log level.
     ///
     /// `None` means all output is disabled.

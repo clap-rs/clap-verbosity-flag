@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Compatibility
+
+- Raised MSRV to 1.73
+
+### Features
+
+- Add `is_present()` to see if one of the flags is present on the command-line
+
 ## [2.1.2] - 2024-01-16
 
 ### Fixes

@@ -40,7 +40,7 @@
 //! - `-vvv` show debug
 //! - `-vvvv` show trace
 //!
-//! You can also customize the default logging level:
+//! You can customize the default logging level using `Verbosity`'s generic parameter:
 //! ```rust,no_run
 //! # use clap::Parser;
 //! use clap_verbosity_flag::{Verbosity, InfoLevel};

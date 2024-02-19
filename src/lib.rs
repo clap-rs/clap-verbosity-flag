@@ -82,6 +82,7 @@ pub struct Verbosity<L: LogLevel = ErrorLevel> {
         help = L::quiet_help(),
         long_help = L::quiet_long_help(),
         conflicts_with = "verbose",
+        hide(L::default().is_none())
     )]
     quiet: u8,
 
@@ -207,6 +208,18 @@ pub struct InfoLevel;
 impl LogLevel for InfoLevel {
     fn default() -> Option<log::Level> {
         Some(log::Level::Info)
+    }
+}
+
+/// Default to [`None`]
+///
+/// Will disable the `--quiet` / `-q` flag.
+#[derive(Copy, Clone, Debug, Default)]
+pub struct OffLevel;
+
+impl LogLevel for OffLevel {
+    fn default() -> Option<log::Level> {
+        None
     }
 }
 

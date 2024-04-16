@@ -56,6 +56,9 @@
 //! Or implement our [`LogLevel`] trait to customize the default log level and help output.
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![warn(missing_docs)]
+#![warn(clippy::print_stderr)]
+#![warn(clippy::print_stdout)]
 
 pub use log::Level;
 pub use log::LevelFilter;
@@ -108,12 +111,12 @@ impl<L: LogLevel> Verbosity<L> {
     /// Get the log level.
     ///
     /// `None` means all output is disabled.
-    pub fn log_level(&self) -> Option<log::Level> {
+    pub fn log_level(&self) -> Option<Level> {
         level_enum(self.verbosity())
     }
 
     /// Get the log level filter.
-    pub fn log_level_filter(&self) -> log::LevelFilter {
+    pub fn log_level_filter(&self) -> LevelFilter {
         level_enum(self.verbosity())
             .map(|l| l.to_level_filter())
             .unwrap_or(log::LevelFilter::Off)
@@ -129,7 +132,7 @@ impl<L: LogLevel> Verbosity<L> {
     }
 }
 
-fn level_value(level: Option<log::Level>) -> i8 {
+fn level_value(level: Option<Level>) -> i8 {
     match level {
         None => -1,
         Some(log::Level::Error) => 0,
@@ -140,7 +143,7 @@ fn level_value(level: Option<log::Level>) -> i8 {
     }
 }
 
-fn level_enum(verbosity: i8) -> Option<log::Level> {
+fn level_enum(verbosity: i8) -> Option<Level> {
     match verbosity {
         std::i8::MIN..=-1 => None,
         0 => Some(log::Level::Error),
@@ -161,51 +164,59 @@ impl<L: LogLevel> fmt::Display for Verbosity<L> {
 
 /// Customize the default log-level and associated help
 pub trait LogLevel {
-    fn default() -> Option<log::Level>;
+    /// Base-line level before applying `--verbose` and `--quiet`
+    fn default() -> Option<Level>;
 
+    /// Short-help message for `--verbose`
     fn verbose_help() -> Option<&'static str> {
         Some("Increase logging verbosity")
     }
 
+    /// Long-help message for `--verbose`
     fn verbose_long_help() -> Option<&'static str> {
         None
     }
 
+    /// Short-help message for `--quiet`
     fn quiet_help() -> Option<&'static str> {
         Some("Decrease logging verbosity")
     }
 
+    /// Long-help message for `--quiet`
     fn quiet_long_help() -> Option<&'static str> {
         None
     }
 }
 
 /// Default to [`log::Level::Error`]
+#[allow(clippy::exhaustive_structs)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct ErrorLevel;
 
 impl LogLevel for ErrorLevel {
-    fn default() -> Option<log::Level> {
+    fn default() -> Option<Level> {
         Some(log::Level::Error)
     }
 }
 
 /// Default to [`log::Level::Warn`]
+#[allow(clippy::exhaustive_structs)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct WarnLevel;
 
 impl LogLevel for WarnLevel {
-    fn default() -> Option<log::Level> {
+    fn default() -> Option<Level> {
         Some(log::Level::Warn)
     }
 }
 
 /// Default to [`log::Level::Info`]
+#[allow(clippy::exhaustive_structs)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct InfoLevel;
 
 impl LogLevel for InfoLevel {
-    fn default() -> Option<log::Level> {
+    fn default() -> Option<Level> {
         Some(log::Level::Info)
     }
 }
@@ -223,6 +234,6 @@ mod test {
         }
 
         use clap::CommandFactory;
-        Cli::command().debug_assert()
+        Cli::command().debug_assert();
     }
 }

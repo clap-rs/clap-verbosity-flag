@@ -119,7 +119,7 @@ impl<L: LogLevel> Verbosity<L> {
     pub fn log_level_filter(&self) -> LevelFilter {
         level_enum(self.verbosity())
             .map(|l| l.to_level_filter())
-            .unwrap_or(log::LevelFilter::Off)
+            .unwrap_or(LevelFilter::Off)
     }
 
     /// If the user requested complete silence (i.e. not just no-logging).
@@ -135,22 +135,22 @@ impl<L: LogLevel> Verbosity<L> {
 fn level_value(level: Option<Level>) -> i8 {
     match level {
         None => -1,
-        Some(log::Level::Error) => 0,
-        Some(log::Level::Warn) => 1,
-        Some(log::Level::Info) => 2,
-        Some(log::Level::Debug) => 3,
-        Some(log::Level::Trace) => 4,
+        Some(Level::Error) => 0,
+        Some(Level::Warn) => 1,
+        Some(Level::Info) => 2,
+        Some(Level::Debug) => 3,
+        Some(Level::Trace) => 4,
     }
 }
 
 fn level_enum(verbosity: i8) -> Option<Level> {
     match verbosity {
         std::i8::MIN..=-1 => None,
-        0 => Some(log::Level::Error),
-        1 => Some(log::Level::Warn),
-        2 => Some(log::Level::Info),
-        3 => Some(log::Level::Debug),
-        4..=std::i8::MAX => Some(log::Level::Trace),
+        0 => Some(Level::Error),
+        1 => Some(Level::Warn),
+        2 => Some(Level::Info),
+        3 => Some(Level::Debug),
+        4..=std::i8::MAX => Some(Level::Trace),
     }
 }
 
@@ -195,7 +195,7 @@ pub struct ErrorLevel;
 
 impl LogLevel for ErrorLevel {
     fn default() -> Option<Level> {
-        Some(log::Level::Error)
+        Some(Level::Error)
     }
 }
 
@@ -206,7 +206,7 @@ pub struct WarnLevel;
 
 impl LogLevel for WarnLevel {
     fn default() -> Option<Level> {
-        Some(log::Level::Warn)
+        Some(Level::Warn)
     }
 }
 
@@ -217,7 +217,7 @@ pub struct InfoLevel;
 
 impl LogLevel for InfoLevel {
     fn default() -> Option<Level> {
-        Some(log::Level::Info)
+        Some(Level::Info)
     }
 }
 

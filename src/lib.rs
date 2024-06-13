@@ -144,12 +144,12 @@ fn level_value(level: Option<Level>) -> i8 {
 
 fn level_enum(verbosity: i8) -> Option<Level> {
     match verbosity {
-        std::i8::MIN..=-1 => None,
+        i8::MIN..=-1 => None,
         0 => Some(Level::Error),
         1 => Some(Level::Warn),
         2 => Some(Level::Info),
         3 => Some(Level::Debug),
-        4..=std::i8::MAX => Some(Level::Trace),
+        4..=i8::MAX => Some(Level::Trace),
     }
 }
 

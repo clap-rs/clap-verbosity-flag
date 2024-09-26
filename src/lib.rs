@@ -128,8 +128,8 @@ impl<L: LogLevel> Verbosity<L> {
 
     fn verbosity(&self) -> u8 {
         let default_verbosity = level_value(L::default());
-        let verbosity = default_verbosity as i8 - (self.quiet as i8) + (self.verbose as i8);
-        verbosity as u8
+        let verbosity = default_verbosity as i16 - self.quiet as i16 + self.verbose as i16;
+        verbosity.clamp(0, u8::MAX as i16) as u8
     }
 }
 
@@ -248,10 +248,10 @@ mod test {
             (3, 0, Some(Level::Debug), LevelFilter::Debug),
             (4, 0, Some(Level::Trace), LevelFilter::Trace),
             (5, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, None, LevelFilter::Off),
+            (255, 0, Some(Level::Trace), LevelFilter::Trace),
             (0, 1, None, LevelFilter::Off),
-            (0, 2, Some(Level::Trace), LevelFilter::Trace),
-            (0, 255, Some(Level::Warn), LevelFilter::Warn),
+            (0, 2, None, LevelFilter::Off),
+            (0, 255, None, LevelFilter::Off),
             (255, 255, Some(Level::Error), LevelFilter::Error),
         ];
 
@@ -279,11 +279,11 @@ mod test {
             (2, 0, Some(Level::Debug), LevelFilter::Debug),
             (3, 0, Some(Level::Trace), LevelFilter::Trace),
             (4, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Error), LevelFilter::Error),
+            (255, 0, Some(Level::Trace), LevelFilter::Trace),
             (0, 1, Some(Level::Error), LevelFilter::Error),
             (0, 2, None, LevelFilter::Off),
-            (0, 3, Some(Level::Trace), LevelFilter::Trace),
-            (0, 255, Some(Level::Info), LevelFilter::Info),
+            (0, 3, None, LevelFilter::Off),
+            (0, 255, None, LevelFilter::Off),
             (255, 255, Some(Level::Warn), LevelFilter::Warn),
         ];
 
@@ -310,12 +310,12 @@ mod test {
             (1, 0, Some(Level::Debug), LevelFilter::Debug),
             (2, 0, Some(Level::Trace), LevelFilter::Trace),
             (3, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Warn), LevelFilter::Warn),
+            (255, 0, Some(Level::Trace), LevelFilter::Trace),
             (0, 1, Some(Level::Warn), LevelFilter::Warn),
             (0, 2, Some(Level::Error), LevelFilter::Error),
             (0, 3, None, LevelFilter::Off),
-            (0, 4, Some(Level::Trace), LevelFilter::Trace),
-            (0, 255, Some(Level::Debug), LevelFilter::Debug),
+            (0, 4, None, LevelFilter::Off),
+            (0, 255, None, LevelFilter::Off),
             (255, 255, Some(Level::Info), LevelFilter::Info),
         ];
 

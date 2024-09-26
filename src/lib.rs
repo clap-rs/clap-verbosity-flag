@@ -133,23 +133,23 @@ impl<L: LogLevel> Verbosity<L> {
 
 fn level_value(level: Option<Level>) -> i8 {
     match level {
-        None => -1,
-        Some(Level::Error) => 0,
-        Some(Level::Warn) => 1,
-        Some(Level::Info) => 2,
-        Some(Level::Debug) => 3,
-        Some(Level::Trace) => 4,
+        None => 0,
+        Some(Level::Error) => 1,
+        Some(Level::Warn) => 2,
+        Some(Level::Info) => 3,
+        Some(Level::Debug) => 4,
+        Some(Level::Trace) => 5,
     }
 }
 
 fn level_enum(verbosity: i8) -> Option<Level> {
     match verbosity {
-        i8::MIN..=-1 => None,
-        0 => Some(Level::Error),
-        1 => Some(Level::Warn),
-        2 => Some(Level::Info),
-        3 => Some(Level::Debug),
-        4..=i8::MAX => Some(Level::Trace),
+        i8::MIN..=0 => None,
+        1 => Some(Level::Error),
+        2 => Some(Level::Warn),
+        3 => Some(Level::Info),
+        4 => Some(Level::Debug),
+        5..=i8::MAX => Some(Level::Trace),
     }
 }
 

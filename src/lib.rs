@@ -127,7 +127,9 @@ impl<L: LogLevel> Verbosity<L> {
     }
 
     fn verbosity(&self) -> i8 {
-        level_value(L::default()) - (self.quiet as i8) + (self.verbose as i8)
+        let default_verbosity = level_value(L::default());
+        let verbosity = default_verbosity - (self.quiet as i8) + (self.verbose as i8);
+        verbosity
     }
 }
 

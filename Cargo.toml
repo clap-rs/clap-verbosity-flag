@@ -86,7 +86,7 @@ zero_sized_map_values = "warn"
 
 [package]
 name = "clap-verbosity-flag"
-version = "2.2.1"
+version = "2.2.2"
 description = "Easily add a `--verbose` flag to CLIs using Clap"
 authors = ["Pascal Hertleif <killercup@gmail.com>"]
 readme = "README.md"

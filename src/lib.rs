@@ -126,14 +126,14 @@ impl<L: LogLevel> Verbosity<L> {
         self.log_level().is_none()
     }
 
-    fn verbosity(&self) -> i8 {
+    fn verbosity(&self) -> u8 {
         let default_verbosity = level_value(L::default());
-        let verbosity = default_verbosity - (self.quiet as i8) + (self.verbose as i8);
-        verbosity
+        let verbosity = default_verbosity as i8 - (self.quiet as i8) + (self.verbose as i8);
+        verbosity as u8
     }
 }
 
-fn level_value(level: Option<Level>) -> i8 {
+fn level_value(level: Option<Level>) -> u8 {
     match level {
         None => 0,
         Some(Level::Error) => 1,
@@ -144,14 +144,14 @@ fn level_value(level: Option<Level>) -> i8 {
     }
 }
 
-fn level_enum(verbosity: i8) -> Option<Level> {
+fn level_enum(verbosity: u8) -> Option<Level> {
     match verbosity {
-        i8::MIN..=0 => None,
+        0 => None,
         1 => Some(Level::Error),
         2 => Some(Level::Warn),
         3 => Some(Level::Info),
         4 => Some(Level::Debug),
-        5..=i8::MAX => Some(Level::Trace),
+        5..=u8::MAX => Some(Level::Trace),
     }
 }
 
@@ -250,7 +250,7 @@ mod test {
             (5, 0, Some(Level::Trace), LevelFilter::Trace),
             (255, 0, None, LevelFilter::Off),
             (0, 1, None, LevelFilter::Off),
-            (0, 2, None, LevelFilter::Off),
+            (0, 2, Some(Level::Trace), LevelFilter::Trace),
             (0, 255, Some(Level::Warn), LevelFilter::Warn),
             (255, 255, Some(Level::Error), LevelFilter::Error),
         ];
@@ -282,7 +282,7 @@ mod test {
             (255, 0, Some(Level::Error), LevelFilter::Error),
             (0, 1, Some(Level::Error), LevelFilter::Error),
             (0, 2, None, LevelFilter::Off),
-            (0, 3, None, LevelFilter::Off),
+            (0, 3, Some(Level::Trace), LevelFilter::Trace),
             (0, 255, Some(Level::Info), LevelFilter::Info),
             (255, 255, Some(Level::Warn), LevelFilter::Warn),
         ];
@@ -314,7 +314,7 @@ mod test {
             (0, 1, Some(Level::Warn), LevelFilter::Warn),
             (0, 2, Some(Level::Error), LevelFilter::Error),
             (0, 3, None, LevelFilter::Off),
-            (0, 4, None, LevelFilter::Off),
+            (0, 4, Some(Level::Trace), LevelFilter::Trace),
             (0, 255, Some(Level::Debug), LevelFilter::Debug),
             (255, 255, Some(Level::Info), LevelFilter::Info),
         ];

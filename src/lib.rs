@@ -63,8 +63,17 @@ pub use log::Level;
 pub use log::LevelFilter;
 
 /// Logging flags to `#[command(flatten)]` into your CLI
-#[derive(clap::Args, Debug, Clone, Default)]
+#[derive(clap::Args, Debug, Clone, Default, PartialEq, Eq)]
 #[command(about = None, long_about = None)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(
+        from = "LevelFilter",
+        into = "LevelFilter",
+        bound(serialize = "L: Clone")
+    )
+)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(
         long,
@@ -144,6 +153,17 @@ fn level_value(level: Option<Level>) -> u8 {
     }
 }
 
+fn level_filter_value(filter: LevelFilter) -> u8 {
+    match filter {
+        LevelFilter::Off => 0,
+        LevelFilter::Error => 1,
+        LevelFilter::Warn => 2,
+        LevelFilter::Info => 3,
+        LevelFilter::Debug => 4,
+        LevelFilter::Trace => 5,
+    }
+}
+
 fn level_enum(verbosity: u8) -> Option<Level> {
     match verbosity {
         0 => None,
@@ -160,6 +180,22 @@ use std::fmt;
 impl<L: LogLevel> fmt::Display for Verbosity<L> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.verbosity())
+    }
+}
+
+impl<L: LogLevel> From<Verbosity<L>> for LevelFilter {
+    fn from(v: Verbosity<L>) -> Self {
+        v.log_level_filter()
+    }
+}
+
+impl<L: LogLevel> From<LevelFilter> for Verbosity<L> {
+    fn from(filter: LevelFilter) -> Self {
+        let default_verbosity = level_value(L::default());
+        let verbosity = level_filter_value(filter);
+        let verbose = verbosity.saturating_sub(default_verbosity);
+        let quiet = default_verbosity.saturating_sub(verbosity);
+        Verbosity::new(verbose, quiet)
     }
 }
 
@@ -191,7 +227,7 @@ pub trait LogLevel {
 
 /// Default to [`log::Level::Error`]
 #[allow(clippy::exhaustive_structs)]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub struct ErrorLevel;
 
 impl LogLevel for ErrorLevel {
@@ -202,7 +238,7 @@ impl LogLevel for ErrorLevel {
 
 /// Default to [`log::Level::Warn`]
 #[allow(clippy::exhaustive_structs)]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub struct WarnLevel;
 
 impl LogLevel for WarnLevel {
@@ -213,7 +249,7 @@ impl LogLevel for WarnLevel {
 
 /// Default to [`log::Level::Info`]
 #[allow(clippy::exhaustive_structs)]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub struct InfoLevel;
 
 impl LogLevel for InfoLevel {
@@ -332,5 +368,162 @@ mod test {
                 "verbose = {verbose}, quiet = {quiet}"
             );
         }
+    }
+
+    #[test]
+    fn from_level_filter_error_level() {
+        let tests = [
+            (LevelFilter::Off, Verbosity::<ErrorLevel>::new(0, 1)),
+            (LevelFilter::Error, Verbosity::<ErrorLevel>::new(0, 0)),
+            (LevelFilter::Warn, Verbosity::<ErrorLevel>::new(1, 0)),
+            (LevelFilter::Info, Verbosity::<ErrorLevel>::new(2, 0)),
+            (LevelFilter::Debug, Verbosity::<ErrorLevel>::new(3, 0)),
+            (LevelFilter::Trace, Verbosity::<ErrorLevel>::new(4, 0)),
+        ];
+        for (filter, expected) in tests.iter() {
+            let verbosity = Verbosity::from(*filter);
+            assert_eq!(verbosity, *expected,);
+            assert_eq!(verbosity.log_level_filter(), *filter,);
+        }
+    }
+
+    #[test]
+    fn from_level_filter_warn_level() {
+        let tests = [
+            (LevelFilter::Off, Verbosity::<WarnLevel>::new(0, 2)),
+            (LevelFilter::Error, Verbosity::<WarnLevel>::new(0, 1)),
+            (LevelFilter::Warn, Verbosity::<WarnLevel>::new(0, 0)),
+            (LevelFilter::Info, Verbosity::<WarnLevel>::new(1, 0)),
+            (LevelFilter::Debug, Verbosity::<WarnLevel>::new(2, 0)),
+            (LevelFilter::Trace, Verbosity::<WarnLevel>::new(3, 0)),
+        ];
+        for (filter, expected) in tests.iter() {
+            let verbosity = Verbosity::from(*filter);
+            assert_eq!(verbosity, *expected,);
+            assert_eq!(verbosity.log_level_filter(), *filter,);
+        }
+    }
+
+    #[test]
+    fn from_level_filter_info_level() {
+        let tests = [
+            (LevelFilter::Off, Verbosity::<InfoLevel>::new(0, 3)),
+            (LevelFilter::Error, Verbosity::<InfoLevel>::new(0, 2)),
+            (LevelFilter::Warn, Verbosity::<InfoLevel>::new(0, 1)),
+            (LevelFilter::Info, Verbosity::<InfoLevel>::new(0, 0)),
+            (LevelFilter::Debug, Verbosity::<InfoLevel>::new(1, 0)),
+            (LevelFilter::Trace, Verbosity::<InfoLevel>::new(2, 0)),
+        ];
+        for (filter, expected) in tests.iter() {
+            let verbosity = Verbosity::from(*filter);
+            assert_eq!(verbosity, *expected,);
+            assert_eq!(verbosity.log_level_filter(), *filter,);
+        }
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn serde_error_level() {
+        use serde_test::{assert_tokens, Token};
+
+        let tests = [
+            (Verbosity::<ErrorLevel>::new(0, 1), "OFF"),
+            (Verbosity::<ErrorLevel>::new(0, 0), "ERROR"),
+            (Verbosity::<ErrorLevel>::new(1, 0), "WARN"),
+            (Verbosity::<ErrorLevel>::new(2, 0), "INFO"),
+            (Verbosity::<ErrorLevel>::new(3, 0), "DEBUG"),
+            (Verbosity::<ErrorLevel>::new(4, 0), "TRACE"),
+        ];
+
+        // check that the verbosity round-trips through serde
+        for (verbosity, variant) in tests.iter() {
+            assert_tokens(
+                verbosity,
+                &[Token::UnitVariant {
+                    name: "LevelFilter",
+                    variant,
+                }],
+            );
+        }
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn serde_warn_level() {
+        use serde_test::{assert_tokens, Token};
+
+        let tests = [
+            (Verbosity::<WarnLevel>::new(0, 2), "OFF"),
+            (Verbosity::<WarnLevel>::new(0, 1), "ERROR"),
+            (Verbosity::<WarnLevel>::new(0, 0), "WARN"),
+            (Verbosity::<WarnLevel>::new(1, 0), "INFO"),
+            (Verbosity::<WarnLevel>::new(2, 0), "DEBUG"),
+            (Verbosity::<WarnLevel>::new(3, 0), "TRACE"),
+        ];
+
+        // check that the verbosity round-trips through serde
+        for (verbosity, variant) in tests.iter() {
+            assert_tokens(
+                verbosity,
+                &[Token::UnitVariant {
+                    name: "LevelFilter",
+                    variant,
+                }],
+            );
+        }
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn serde_info_level() {
+        use serde_test::{assert_tokens, Token};
+
+        let tests = [
+            (Verbosity::<InfoLevel>::new(0, 3), "OFF"),
+            (Verbosity::<InfoLevel>::new(0, 2), "ERROR"),
+            (Verbosity::<InfoLevel>::new(0, 1), "WARN"),
+            (Verbosity::<InfoLevel>::new(0, 0), "INFO"),
+            (Verbosity::<InfoLevel>::new(1, 0), "DEBUG"),
+            (Verbosity::<InfoLevel>::new(2, 0), "TRACE"),
+        ];
+
+        // check that the verbosity round-trips through serde
+        for (verbosity, variant) in tests.iter() {
+            assert_tokens(
+                verbosity,
+                &[Token::UnitVariant {
+                    name: "LevelFilter",
+                    variant,
+                }],
+            );
+        }
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn serde_toml() {
+        use clap::Parser;
+        use serde::{Deserialize, Serialize};
+
+        #[derive(Debug, Parser, Serialize, Deserialize)]
+        struct Cli {
+            meaning_of_life: u8,
+            #[command(flatten)]
+            verbose: Verbosity<InfoLevel>,
+        }
+
+        // round-trips through serde. The default serialization is the uppercase name of the variant
+        // as this is how log::LevelFilter is serialized.
+        let toml = "meaning_of_life = 42\nverbose = \"DEBUG\"\n";
+        let cli: Cli = toml::from_str(toml).unwrap();
+        assert_eq!(cli.verbose.log_level_filter(), LevelFilter::Debug);
+        assert_eq!(toml::to_string(&cli).unwrap(), toml);
+
+        // Checks that deserializing a lowercase level also works fine. Serializing is likely less
+        // frequent than deserializing from a config file, so this is a more common case than the
+        // above serialize then deserialize test.
+        let toml = "meaning_of_life = 42\nverbose = \"debug\"\n";
+        let cli: Cli = toml::from_str(toml).unwrap();
+        assert_eq!(cli.verbose.log_level_filter(), LevelFilter::Debug);
     }
 }

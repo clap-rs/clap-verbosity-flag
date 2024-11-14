@@ -59,10 +59,16 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-pub use log::Level;
-pub use log::LevelFilter;
+/// These types are re-exported for backwards compatibility only.
+#[cfg(any(doc, feature = "log"))]
+#[doc(hidden)]
+pub use self::log::{ErrorLevel, InfoLevel, WarnLevel};
+
+#[cfg(any(doc, feature = "log"))]
+pub mod log;
 
 /// Logging flags to `#[command(flatten)]` into your CLI
+#[cfg(any(doc, feature = "log"))]
 #[derive(clap::Args, Debug, Clone, Default)]
 #[command(about = None, long_about = None)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
@@ -91,7 +97,40 @@ pub struct Verbosity<L: LogLevel = ErrorLevel> {
     phantom: std::marker::PhantomData<L>,
 }
 
-impl<L: LogLevel> Verbosity<L> {
+/// Logging flags to `#[command(flatten)]` into your CLI
+#[cfg(not(any(doc, feature = "log")))]
+#[derive(clap::Args, Debug, Clone, Default)]
+#[command(about = None, long_about = None)]
+pub struct Verbosity<L: LogLevel> {
+    #[arg(
+        long,
+        short = 'v',
+        action = clap::ArgAction::Count,
+        global = true,
+        help = L::verbose_help(),
+        long_help = L::verbose_long_help(),
+    )]
+    verbose: u8,
+
+    #[arg(
+        long,
+        short = 'q',
+        action = clap::ArgAction::Count,
+        global = true,
+        help = L::quiet_help(),
+        long_help = L::quiet_long_help(),
+        conflicts_with = "verbose",
+    )]
+    quiet: u8,
+
+    #[arg(skip)]
+    phantom: std::marker::PhantomData<L>,
+}
+
+impl<L: LogLevel> Verbosity<L>
+where
+    Filter: Into<Option<L::Level>> + Into<L::LevelFilter> + From<Option<L::Level>>,
+{
     /// Create a new verbosity instance by explicitly setting the values
     pub fn new(verbose: u8, quiet: u8) -> Self {
         Verbosity {
@@ -110,12 +149,12 @@ impl<L: LogLevel> Verbosity<L> {
     /// Get the log level.
     ///
     /// `None` means all output is disabled.
-    pub fn log_level(&self) -> Option<Level> {
+    pub fn log_level(&self) -> Option<L::Level> {
         self.filter().into()
     }
 
     /// Get the log level filter.
-    pub fn log_level_filter(&self) -> LevelFilter {
+    pub fn log_level_filter(&self) -> L::LevelFilter {
         self.filter().into()
     }
 
@@ -134,7 +173,7 @@ impl<L: LogLevel> Verbosity<L> {
 ///
 /// Used to calculate the log level and filter.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Filter {
+pub enum Filter {
     Off,
     Error,
     Warn,
@@ -191,61 +230,12 @@ impl fmt::Display for Filter {
     }
 }
 
-impl From<Filter> for LevelFilter {
-    fn from(filter: Filter) -> Self {
-        match filter {
-            Filter::Off => LevelFilter::Off,
-            Filter::Error => LevelFilter::Error,
-            Filter::Warn => LevelFilter::Warn,
-            Filter::Info => LevelFilter::Info,
-            Filter::Debug => LevelFilter::Debug,
-            Filter::Trace => LevelFilter::Trace,
-        }
-    }
-}
-
-impl From<LevelFilter> for Filter {
-    fn from(level: LevelFilter) -> Self {
-        match level {
-            LevelFilter::Off => Filter::Off,
-            LevelFilter::Error => Filter::Error,
-            LevelFilter::Warn => Filter::Warn,
-            LevelFilter::Info => Filter::Info,
-            LevelFilter::Debug => Filter::Debug,
-            LevelFilter::Trace => Filter::Trace,
-        }
-    }
-}
-
-impl From<Filter> for Option<Level> {
-    fn from(filter: Filter) -> Self {
-        match filter {
-            Filter::Off => None,
-            Filter::Error => Some(Level::Error),
-            Filter::Warn => Some(Level::Warn),
-            Filter::Info => Some(Level::Info),
-            Filter::Debug => Some(Level::Debug),
-            Filter::Trace => Some(Level::Trace),
-        }
-    }
-}
-
-impl From<Option<Level>> for Filter {
-    fn from(level: Option<Level>) -> Self {
-        match level {
-            None => Filter::Off,
-            Some(Level::Error) => Filter::Error,
-            Some(Level::Warn) => Filter::Warn,
-            Some(Level::Info) => Filter::Info,
-            Some(Level::Debug) => Filter::Debug,
-            Some(Level::Trace) => Filter::Trace,
-        }
-    }
-}
-
 use std::fmt;
 
-impl<L: LogLevel> fmt::Display for Verbosity<L> {
+impl<L: LogLevel> fmt::Display for Verbosity<L>
+where
+    Filter: Into<Option<L::Level>> + Into<L::LevelFilter> + From<Option<L::Level>>,
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.filter())
     }
@@ -253,8 +243,11 @@ impl<L: LogLevel> fmt::Display for Verbosity<L> {
 
 /// Customize the default log-level and associated help
 pub trait LogLevel {
+    type Level;
+    type LevelFilter;
+
     /// Base-line level before applying `--verbose` and `--quiet`
-    fn default() -> Option<Level>;
+    fn default() -> Option<Self::Level>;
 
     /// Short-help message for `--verbose`
     fn verbose_help() -> Option<&'static str> {
@@ -277,39 +270,6 @@ pub trait LogLevel {
     }
 }
 
-/// Default to [`log::Level::Error`]
-#[allow(clippy::exhaustive_structs)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct ErrorLevel;
-
-impl LogLevel for ErrorLevel {
-    fn default() -> Option<Level> {
-        Some(Level::Error)
-    }
-}
-
-/// Default to [`log::Level::Warn`]
-#[allow(clippy::exhaustive_structs)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct WarnLevel;
-
-impl LogLevel for WarnLevel {
-    fn default() -> Option<Level> {
-        Some(Level::Warn)
-    }
-}
-
-/// Default to [`log::Level::Info`]
-#[allow(clippy::exhaustive_structs)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct InfoLevel;
-
-impl LogLevel for InfoLevel {
-    fn default() -> Option<Level> {
-        Some(Level::Info)
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -324,101 +284,5 @@ mod test {
 
         use clap::CommandFactory;
         Cli::command().debug_assert();
-    }
-
-    #[test]
-    fn verbosity_error_level() {
-        let tests = [
-            // verbose, quiet, expected_level, expected_filter
-            (0, 0, Some(Level::Error), LevelFilter::Error),
-            (1, 0, Some(Level::Warn), LevelFilter::Warn),
-            (2, 0, Some(Level::Info), LevelFilter::Info),
-            (3, 0, Some(Level::Debug), LevelFilter::Debug),
-            (4, 0, Some(Level::Trace), LevelFilter::Trace),
-            (5, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Trace), LevelFilter::Trace),
-            (0, 1, None, LevelFilter::Off),
-            (0, 2, None, LevelFilter::Off),
-            (0, 255, None, LevelFilter::Off),
-            (255, 255, Some(Level::Error), LevelFilter::Error),
-        ];
-
-        for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
-            let v = Verbosity::<ErrorLevel>::new(*verbose, *quiet);
-            assert_eq!(
-                v.log_level(),
-                *expected_level,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-            assert_eq!(
-                v.log_level_filter(),
-                *expected_filter,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-        }
-    }
-
-    #[test]
-    fn verbosity_warn_level() {
-        let tests = [
-            // verbose, quiet, expected_level, expected_filter
-            (0, 0, Some(Level::Warn), LevelFilter::Warn),
-            (1, 0, Some(Level::Info), LevelFilter::Info),
-            (2, 0, Some(Level::Debug), LevelFilter::Debug),
-            (3, 0, Some(Level::Trace), LevelFilter::Trace),
-            (4, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Trace), LevelFilter::Trace),
-            (0, 1, Some(Level::Error), LevelFilter::Error),
-            (0, 2, None, LevelFilter::Off),
-            (0, 3, None, LevelFilter::Off),
-            (0, 255, None, LevelFilter::Off),
-            (255, 255, Some(Level::Warn), LevelFilter::Warn),
-        ];
-
-        for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
-            let v = Verbosity::<WarnLevel>::new(*verbose, *quiet);
-            assert_eq!(
-                v.log_level(),
-                *expected_level,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-            assert_eq!(
-                v.log_level_filter(),
-                *expected_filter,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-        }
-    }
-
-    #[test]
-    fn verbosity_info_level() {
-        let tests = [
-            // verbose, quiet, expected_level, expected_filter
-            (0, 0, Some(Level::Info), LevelFilter::Info),
-            (1, 0, Some(Level::Debug), LevelFilter::Debug),
-            (2, 0, Some(Level::Trace), LevelFilter::Trace),
-            (3, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Trace), LevelFilter::Trace),
-            (0, 1, Some(Level::Warn), LevelFilter::Warn),
-            (0, 2, Some(Level::Error), LevelFilter::Error),
-            (0, 3, None, LevelFilter::Off),
-            (0, 4, None, LevelFilter::Off),
-            (0, 255, None, LevelFilter::Off),
-            (255, 255, Some(Level::Info), LevelFilter::Info),
-        ];
-
-        for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
-            let v = Verbosity::<InfoLevel>::new(*verbose, *quiet);
-            assert_eq!(
-                v.log_level(),
-                *expected_level,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-            assert_eq!(
-                v.log_level_filter(),
-                *expected_filter,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-        }
     }
 }

@@ -133,5 +133,9 @@ tracing-subscriber = "0.3"
 workspace = true
 
 [[example]]
+name = "log"
+required-features = ["log"]
+
+[[example]]
 name = "tracing"
 required-features = ["tracing"]

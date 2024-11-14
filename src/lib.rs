@@ -215,7 +215,7 @@ impl Filter {
             2 => Filter::Warn,
             3 => Filter::Info,
             4 => Filter::Debug,
-            5.. => Filter::Trace,
+            _ => Filter::Trace,
         }
     }
 }
@@ -275,14 +275,42 @@ pub trait LogLevel {
 
 #[cfg(test)]
 mod test {
+    #[allow(unused_imports)]
     use super::*;
 
     #[test]
-    fn verify_app() {
+    #[cfg(feature = "log")]
+    fn default_verbosity() {
         #[derive(Debug, clap::Parser)]
         struct Cli {
             #[command(flatten)]
             verbose: Verbosity,
+        }
+
+        use clap::CommandFactory;
+        Cli::command().debug_assert();
+    }
+
+    #[test]
+    #[cfg(feature = "log")]
+    fn verbosity_with_log() {
+        #[derive(Debug, clap::Parser)]
+        struct Cli {
+            #[command(flatten)]
+            verbose: Verbosity<InfoLevel>,
+        }
+
+        use clap::CommandFactory;
+        Cli::command().debug_assert();
+    }
+
+    #[test]
+    #[cfg(feature = "tracing")]
+    fn verbosity_with_tracing() {
+        #[derive(Debug, clap::Parser)]
+        struct Cli {
+            #[command(flatten)]
+            verbose: Verbosity<tracing::ErrorLevel>,
         }
 
         use clap::CommandFactory;

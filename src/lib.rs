@@ -67,6 +67,9 @@ pub use self::log::{ErrorLevel, InfoLevel, WarnLevel};
 #[cfg(any(doc, feature = "log"))]
 pub mod log;
 
+#[cfg(any(doc, feature = "tracing"))]
+pub mod tracing;
+
 /// Logging flags to `#[command(flatten)]` into your CLI
 #[cfg(any(doc, feature = "log"))]
 #[derive(clap::Args, Debug, Clone, Default)]

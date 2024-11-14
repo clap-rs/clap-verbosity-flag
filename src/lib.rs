@@ -111,47 +111,135 @@ impl<L: LogLevel> Verbosity<L> {
     ///
     /// `None` means all output is disabled.
     pub fn log_level(&self) -> Option<Level> {
-        level_enum(self.verbosity())
+        self.filter().into()
     }
 
     /// Get the log level filter.
     pub fn log_level_filter(&self) -> LevelFilter {
-        level_enum(self.verbosity())
-            .map(|l| l.to_level_filter())
-            .unwrap_or(LevelFilter::Off)
+        self.filter().into()
     }
 
     /// If the user requested complete silence (i.e. not just no-logging).
     pub fn is_silent(&self) -> bool {
-        self.log_level().is_none()
+        self.filter() == Filter::Off
     }
 
-    fn verbosity(&self) -> u8 {
-        let default_verbosity = level_value(L::default());
-        let verbosity = default_verbosity as i16 - self.quiet as i16 + self.verbose as i16;
-        verbosity.clamp(0, u8::MAX as i16) as u8
-    }
-}
-
-fn level_value(level: Option<Level>) -> u8 {
-    match level {
-        None => 0,
-        Some(Level::Error) => 1,
-        Some(Level::Warn) => 2,
-        Some(Level::Info) => 3,
-        Some(Level::Debug) => 4,
-        Some(Level::Trace) => 5,
+    fn filter(&self) -> Filter {
+        let offset = self.verbose as i16 - self.quiet as i16;
+        Filter::from(L::default()).with_offset(offset)
     }
 }
 
-fn level_enum(verbosity: u8) -> Option<Level> {
-    match verbosity {
-        0 => None,
-        1 => Some(Level::Error),
-        2 => Some(Level::Warn),
-        3 => Some(Level::Info),
-        4 => Some(Level::Debug),
-        5..=u8::MAX => Some(Level::Trace),
+/// An internal representation of the log level filter.
+///
+/// Used to calculate the log level and filter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Filter {
+    Off,
+    Error,
+    Warn,
+    Info,
+    Debug,
+    Trace,
+}
+
+impl Filter {
+    /// Apply an offset to the filter level.
+    fn with_offset(&self, offset: i16) -> Filter {
+        let value = self.as_usize() as i16 + offset;
+        const MAX_LEVEL: i16 = 5;
+        Self::from_usize(value.clamp(0, MAX_LEVEL) as usize)
+    }
+
+    /// Convert the filter to a usize for arithmetic.
+    ///
+    /// usize avoids negative values (and is used in the log crate).
+    fn as_usize(&self) -> usize {
+        match self {
+            Filter::Off => 0,
+            Filter::Error => 1,
+            Filter::Warn => 2,
+            Filter::Info => 3,
+            Filter::Debug => 4,
+            Filter::Trace => 5,
+        }
+    }
+
+    /// Convert a usize back to a filter.
+    fn from_usize(value: usize) -> Self {
+        match value {
+            0 => Filter::Off,
+            1 => Filter::Error,
+            2 => Filter::Warn,
+            3 => Filter::Info,
+            4 => Filter::Debug,
+            5.. => Filter::Trace,
+        }
+    }
+}
+
+impl fmt::Display for Filter {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Filter::Off => write!(f, "off"),
+            Filter::Error => write!(f, "error"),
+            Filter::Warn => write!(f, "warn"),
+            Filter::Info => write!(f, "info"),
+            Filter::Debug => write!(f, "debug"),
+            Filter::Trace => write!(f, "trace"),
+        }
+    }
+}
+
+impl From<Filter> for LevelFilter {
+    fn from(filter: Filter) -> Self {
+        match filter {
+            Filter::Off => LevelFilter::Off,
+            Filter::Error => LevelFilter::Error,
+            Filter::Warn => LevelFilter::Warn,
+            Filter::Info => LevelFilter::Info,
+            Filter::Debug => LevelFilter::Debug,
+            Filter::Trace => LevelFilter::Trace,
+        }
+    }
+}
+
+impl From<LevelFilter> for Filter {
+    fn from(level: LevelFilter) -> Self {
+        match level {
+            LevelFilter::Off => Filter::Off,
+            LevelFilter::Error => Filter::Error,
+            LevelFilter::Warn => Filter::Warn,
+            LevelFilter::Info => Filter::Info,
+            LevelFilter::Debug => Filter::Debug,
+            LevelFilter::Trace => Filter::Trace,
+        }
+    }
+}
+
+impl From<Filter> for Option<Level> {
+    fn from(filter: Filter) -> Self {
+        match filter {
+            Filter::Off => None,
+            Filter::Error => Some(Level::Error),
+            Filter::Warn => Some(Level::Warn),
+            Filter::Info => Some(Level::Info),
+            Filter::Debug => Some(Level::Debug),
+            Filter::Trace => Some(Level::Trace),
+        }
+    }
+}
+
+impl From<Option<Level>> for Filter {
+    fn from(level: Option<Level>) -> Self {
+        match level {
+            None => Filter::Off,
+            Some(Level::Error) => Filter::Error,
+            Some(Level::Warn) => Filter::Warn,
+            Some(Level::Info) => Filter::Info,
+            Some(Level::Debug) => Filter::Debug,
+            Some(Level::Trace) => Filter::Trace,
+        }
     }
 }
 
@@ -159,7 +247,7 @@ use std::fmt;
 
 impl<L: LogLevel> fmt::Display for Verbosity<L> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.verbosity())
+        write!(f, "{}", self.filter())
     }
 }
 

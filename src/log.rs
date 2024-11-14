@@ -58,43 +58,29 @@ impl From<Option<Level>> for Filter {
     }
 }
 
-/// Default to [`log::Level::Error`]
-#[allow(clippy::exhaustive_structs)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct ErrorLevel;
+/// Defines a list of log levels that can be used with `Verbosity`.
+macro_rules! log_levels {
+    ($($name:ident => $level:expr,)*) => {
+        $(
+            #[doc = concat!("Default to [`log::Level::", stringify!($name), "`]")]
+            #[derive(Copy, Clone, Debug, Default)]
+            pub struct $name;
 
-impl LogLevel for ErrorLevel {
-    type Level = Level;
-    type LevelFilter = LevelFilter;
-    fn default() -> Option<Level> {
-        Some(Level::Error)
+            impl LogLevel for $name {
+                type Level = Level;
+                type LevelFilter = LevelFilter;
+                fn default() -> Option<Level> {
+                    Some($level)
+                }
+            }
+        )*
     }
 }
 
-/// Default to [`log::Level::Warn`]
-#[allow(clippy::exhaustive_structs)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct WarnLevel;
-
-impl LogLevel for WarnLevel {
-    type Level = Level;
-    type LevelFilter = LevelFilter;
-    fn default() -> Option<Level> {
-        Some(Level::Warn)
-    }
-}
-
-/// Default to [`log::Level::Info`]
-#[allow(clippy::exhaustive_structs)]
-#[derive(Copy, Clone, Debug, Default)]
-pub struct InfoLevel;
-
-impl LogLevel for InfoLevel {
-    type Level = Level;
-    type LevelFilter = LevelFilter;
-    fn default() -> Option<Level> {
-        Some(Level::Info)
-    }
+log_levels! {
+    ErrorLevel => Level::Error,
+    WarnLevel => Level::Warn,
+    InfoLevel => Level::Info,
 }
 
 #[cfg(test)]

@@ -3,7 +3,7 @@
 // information.
 pub use log::{Level, LevelFilter};
 
-use crate::Filter;
+use crate::{Filter, LogLevel, Verbosity};
 
 impl From<Filter> for LevelFilter {
     fn from(filter: Filter) -> Self {
@@ -57,203 +57,79 @@ impl From<Option<Level>> for Filter {
     }
 }
 
+impl<L: LogLevel> Verbosity<L> {
+    /// Get the log level.
+    ///
+    /// `None` means all output is disabled.
+    pub fn log_level(&self) -> Option<Level> {
+        self.filter().into()
+    }
+
+    /// Get the log level filter.
+    pub fn log_level_filter(&self) -> LevelFilter {
+        self.filter().into()
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::{DebugLevel, ErrorLevel, InfoLevel, OffLevel, TraceLevel, Verbosity, WarnLevel};
 
-    use super::*;
-
     #[test]
-    fn verbosity_off_level() {
-        let tests = [
-            // verbose, quiet, expected_level, expected_filter
-            (0, 0, None, LevelFilter::Off),
-            (1, 0, Some(Level::Error), LevelFilter::Error),
-            (2, 0, Some(Level::Warn), LevelFilter::Warn),
-            (3, 0, Some(Level::Info), LevelFilter::Info),
-            (4, 0, Some(Level::Debug), LevelFilter::Debug),
-            (5, 0, Some(Level::Trace), LevelFilter::Trace),
-            (6, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Trace), LevelFilter::Trace),
-            (0, 1, None, LevelFilter::Off),
-            (0, 2, None, LevelFilter::Off),
-            (0, 255, None, LevelFilter::Off),
-            (255, 255, None, LevelFilter::Off),
-        ];
-
-        for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
-            let v = Verbosity::<OffLevel>::new(*verbose, *quiet);
-            assert_eq!(
-                v.log_level(),
-                *expected_level,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-            assert_eq!(
-                v.log_level_filter(),
-                *expected_filter,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-        }
+    fn log_level_filter() {
+        let default: Verbosity = Verbosity::default();
+        assert_eq!(default.log_level_filter(), LevelFilter::Error);
+        assert_eq!(
+            Verbosity::<OffLevel>::default().log_level_filter(),
+            LevelFilter::Off
+        );
+        assert_eq!(
+            Verbosity::<ErrorLevel>::default().log_level_filter(),
+            LevelFilter::Error
+        );
+        assert_eq!(
+            Verbosity::<WarnLevel>::default().log_level_filter(),
+            LevelFilter::Warn
+        );
+        assert_eq!(
+            Verbosity::<InfoLevel>::default().log_level_filter(),
+            LevelFilter::Info
+        );
+        assert_eq!(
+            Verbosity::<DebugLevel>::default().log_level_filter(),
+            LevelFilter::Debug
+        );
+        assert_eq!(
+            Verbosity::<TraceLevel>::default().log_level_filter(),
+            LevelFilter::Trace
+        );
     }
 
     #[test]
-    fn verbosity_error_level() {
-        let tests = [
-            // verbose, quiet, expected_level, expected_filter
-            (0, 0, Some(Level::Error), LevelFilter::Error),
-            (1, 0, Some(Level::Warn), LevelFilter::Warn),
-            (2, 0, Some(Level::Info), LevelFilter::Info),
-            (3, 0, Some(Level::Debug), LevelFilter::Debug),
-            (4, 0, Some(Level::Trace), LevelFilter::Trace),
-            (5, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Trace), LevelFilter::Trace),
-            (0, 1, None, LevelFilter::Off),
-            (0, 2, None, LevelFilter::Off),
-            (0, 255, None, LevelFilter::Off),
-            (255, 255, Some(Level::Error), LevelFilter::Error),
-        ];
-
-        for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
-            let v = Verbosity::<ErrorLevel>::new(*verbose, *quiet);
-            assert_eq!(
-                v.log_level(),
-                *expected_level,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-            assert_eq!(
-                v.log_level_filter(),
-                *expected_filter,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-        }
-    }
-
-    #[test]
-    fn verbosity_warn_level() {
-        let tests = [
-            // verbose, quiet, expected_level, expected_filter
-            (0, 0, Some(Level::Warn), LevelFilter::Warn),
-            (1, 0, Some(Level::Info), LevelFilter::Info),
-            (2, 0, Some(Level::Debug), LevelFilter::Debug),
-            (3, 0, Some(Level::Trace), LevelFilter::Trace),
-            (4, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Trace), LevelFilter::Trace),
-            (0, 1, Some(Level::Error), LevelFilter::Error),
-            (0, 2, None, LevelFilter::Off),
-            (0, 3, None, LevelFilter::Off),
-            (0, 255, None, LevelFilter::Off),
-            (255, 255, Some(Level::Warn), LevelFilter::Warn),
-        ];
-
-        for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
-            let v = Verbosity::<WarnLevel>::new(*verbose, *quiet);
-            assert_eq!(
-                v.log_level(),
-                *expected_level,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-            assert_eq!(
-                v.log_level_filter(),
-                *expected_filter,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-        }
-    }
-
-    #[test]
-    fn verbosity_info_level() {
-        let tests = [
-            // verbose, quiet, expected_level, expected_filter
-            (0, 0, Some(Level::Info), LevelFilter::Info),
-            (1, 0, Some(Level::Debug), LevelFilter::Debug),
-            (2, 0, Some(Level::Trace), LevelFilter::Trace),
-            (3, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Trace), LevelFilter::Trace),
-            (0, 1, Some(Level::Warn), LevelFilter::Warn),
-            (0, 2, Some(Level::Error), LevelFilter::Error),
-            (0, 3, None, LevelFilter::Off),
-            (0, 4, None, LevelFilter::Off),
-            (0, 255, None, LevelFilter::Off),
-            (255, 255, Some(Level::Info), LevelFilter::Info),
-        ];
-
-        for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
-            let v = Verbosity::<InfoLevel>::new(*verbose, *quiet);
-            assert_eq!(
-                v.log_level(),
-                *expected_level,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-            assert_eq!(
-                v.log_level_filter(),
-                *expected_filter,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-        }
-    }
-
-    #[test]
-    fn verbosity_debug_level() {
-        let tests = [
-            // verbose, quiet, expected_level, expected_filter
-            (0, 0, Some(Level::Debug), LevelFilter::Debug),
-            (1, 0, Some(Level::Trace), LevelFilter::Trace),
-            (2, 0, Some(Level::Trace), LevelFilter::Trace),
-            (3, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Trace), LevelFilter::Trace),
-            (0, 1, Some(Level::Info), LevelFilter::Info),
-            (0, 2, Some(Level::Warn), LevelFilter::Warn),
-            (0, 3, Some(Level::Error), LevelFilter::Error),
-            (0, 4, None, LevelFilter::Off),
-            (0, 255, None, LevelFilter::Off),
-            (255, 255, Some(Level::Debug), LevelFilter::Debug),
-        ];
-
-        for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
-            let v = Verbosity::<DebugLevel>::new(*verbose, *quiet);
-            assert_eq!(
-                v.log_level(),
-                *expected_level,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-            assert_eq!(
-                v.log_level_filter(),
-                *expected_filter,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-        }
-    }
-
-    #[test]
-    fn verbosity_trace_level() {
-        let tests = [
-            // verbose, quiet, expected_level, expected_filter
-            (0, 0, Some(Level::Trace), LevelFilter::Trace),
-            (1, 0, Some(Level::Trace), LevelFilter::Trace),
-            (2, 0, Some(Level::Trace), LevelFilter::Trace),
-            (3, 0, Some(Level::Trace), LevelFilter::Trace),
-            (255, 0, Some(Level::Trace), LevelFilter::Trace),
-            (0, 1, Some(Level::Debug), LevelFilter::Debug),
-            (0, 2, Some(Level::Info), LevelFilter::Info),
-            (0, 3, Some(Level::Warn), LevelFilter::Warn),
-            (0, 4, Some(Level::Error), LevelFilter::Error),
-            (0, 5, None, LevelFilter::Off),
-            (0, 255, None, LevelFilter::Off),
-            (255, 255, Some(Level::Trace), LevelFilter::Trace),
-        ];
-
-        for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
-            let v = Verbosity::<TraceLevel>::new(*verbose, *quiet);
-            assert_eq!(
-                v.log_level(),
-                *expected_level,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-            assert_eq!(
-                v.log_level_filter(),
-                *expected_filter,
-                "verbose = {verbose}, quiet = {quiet}"
-            );
-        }
+    fn log_level() {
+        let default: Verbosity = Verbosity::default();
+        assert_eq!(default.log_level(), Some(Level::Error));
+        assert_eq!(Verbosity::<OffLevel>::default().log_level(), None);
+        assert_eq!(
+            Verbosity::<ErrorLevel>::default().log_level(),
+            Some(Level::Error)
+        );
+        assert_eq!(
+            Verbosity::<WarnLevel>::default().log_level(),
+            Some(Level::Warn)
+        );
+        assert_eq!(
+            Verbosity::<InfoLevel>::default().log_level(),
+            Some(Level::Info)
+        );
+        assert_eq!(
+            Verbosity::<DebugLevel>::default().log_level(),
+            Some(Level::Debug)
+        );
+        assert_eq!(
+            Verbosity::<TraceLevel>::default().log_level(),
+            Some(Level::Trace)
+        );
     }
 }

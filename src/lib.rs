@@ -121,34 +121,6 @@ impl<L: LogLevel> Verbosity<L> {
         self.verbose != 0 || self.quiet != 0
     }
 
-    /// Get the log level.
-    ///
-    /// `None` means all output is disabled.
-    #[cfg(feature = "log")]
-    pub fn log_level(&self) -> Option<log::Level> {
-        self.filter().into()
-    }
-
-    /// Get the log level filter.
-    #[cfg(feature = "log")]
-    pub fn log_level_filter(&self) -> log::LevelFilter {
-        self.filter().into()
-    }
-
-    /// Get the trace level.
-    ///
-    /// `None` means all output is disabled.
-    #[cfg(feature = "tracing")]
-    pub fn tracing_level(&self) -> Option<tracing_core::Level> {
-        self.filter().into()
-    }
-
-    /// Get the trace level filter.
-    #[cfg(feature = "tracing")]
-    pub fn tracing_level_filter(&self) -> tracing_core::LevelFilter {
-        self.filter().into()
-    }
-
     /// If the user requested complete silence (i.e. not just no-logging).
     pub fn is_silent(&self) -> bool {
         self.filter() == Filter::Off
@@ -251,7 +223,7 @@ macro_rules! def_log_levels {
     ($($name:ident => $filter:expr,)*) => {
         $(
             #[doc = concat!("An implementation of [`LogLevel`] that defaults to `", stringify!($filter), "`")]
-            #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+            #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
             pub struct $name;
 
             impl LogLevel for $name {
@@ -298,5 +270,145 @@ mod test {
         }
 
         Cli::command().debug_assert();
+    }
+
+    #[track_caller]
+    fn assert_filter<L: LogLevel>(verbose: u8, quiet: u8, expected: Filter) {
+        let v = Verbosity::<L>::new(verbose, quiet);
+        assert_eq!(v.filter(), expected, "verbose = {verbose}, quiet = {quiet}");
+    }
+
+    #[test]
+    fn verbosity_off_level() {
+        let tests = [
+            // verbose, quiet, expected
+            (0, 0, Filter::Off),
+            (1, 0, Filter::Error),
+            (2, 0, Filter::Warn),
+            (3, 0, Filter::Info),
+            (4, 0, Filter::Debug),
+            (5, 0, Filter::Trace),
+            (6, 0, Filter::Trace),
+            (255, 0, Filter::Trace),
+            (0, 1, Filter::Off),
+            (0, 2, Filter::Off),
+            (0, 255, Filter::Off),
+            (255, 255, Filter::Off),
+        ];
+
+        for (verbose, quiet, expected) in tests.iter() {
+            assert_filter::<OffLevel>(*verbose, *quiet, *expected);
+        }
+    }
+
+    #[test]
+    fn verbosity_error_level() {
+        let tests = [
+            // verbose, quiet, expected
+            (0, 0, Filter::Error),
+            (1, 0, Filter::Warn),
+            (2, 0, Filter::Info),
+            (3, 0, Filter::Debug),
+            (4, 0, Filter::Trace),
+            (5, 0, Filter::Trace),
+            (255, 0, Filter::Trace),
+            (0, 1, Filter::Off),
+            (0, 2, Filter::Off),
+            (0, 255, Filter::Off),
+            (255, 255, Filter::Error),
+        ];
+
+        for (verbose, quiet, expected) in tests.iter() {
+            assert_filter::<ErrorLevel>(*verbose, *quiet, *expected);
+        }
+    }
+
+    #[test]
+    fn verbosity_warn_level() {
+        let tests = [
+            // verbose, quiet, expected
+            (0, 0, Filter::Warn),
+            (1, 0, Filter::Info),
+            (2, 0, Filter::Debug),
+            (3, 0, Filter::Trace),
+            (4, 0, Filter::Trace),
+            (255, 0, Filter::Trace),
+            (0, 1, Filter::Error),
+            (0, 2, Filter::Off),
+            (0, 3, Filter::Off),
+            (0, 255, Filter::Off),
+            (255, 255, Filter::Warn),
+        ];
+
+        for (verbose, quiet, expected) in tests.iter() {
+            assert_filter::<WarnLevel>(*verbose, *quiet, *expected);
+        }
+    }
+
+    #[test]
+    fn verbosity_info_level() {
+        let tests = [
+            // verbose, quiet, expected
+            (0, 0, Filter::Info),
+            (1, 0, Filter::Debug),
+            (2, 0, Filter::Trace),
+            (3, 0, Filter::Trace),
+            (255, 0, Filter::Trace),
+            (0, 1, Filter::Warn),
+            (0, 2, Filter::Error),
+            (0, 3, Filter::Off),
+            (0, 4, Filter::Off),
+            (0, 255, Filter::Off),
+            (255, 255, Filter::Info),
+        ];
+
+        for (verbose, quiet, expected) in tests.iter() {
+            assert_filter::<InfoLevel>(*verbose, *quiet, *expected);
+        }
+    }
+
+    #[test]
+    fn verbosity_debug_level() {
+        let tests = [
+            // verbose, quiet, expected
+            (0, 0, Filter::Debug),
+            (1, 0, Filter::Trace),
+            (2, 0, Filter::Trace),
+            (3, 0, Filter::Trace),
+            (255, 0, Filter::Trace),
+            (0, 1, Filter::Info),
+            (0, 2, Filter::Warn),
+            (0, 3, Filter::Error),
+            (0, 4, Filter::Off),
+            (0, 255, Filter::Off),
+            (255, 255, Filter::Debug),
+        ];
+
+        for (verbose, quiet, expected) in tests.iter() {
+            assert_filter::<DebugLevel>(*verbose, *quiet, *expected);
+        }
+    }
+
+    #[test]
+    fn verbosity_trace_level() {
+        let tests = [
+            // verbose, quiet, expected
+            (0, 0, Filter::Trace),
+            (1, 0, Filter::Trace),
+            (2, 0, Filter::Trace),
+            (3, 0, Filter::Trace),
+            (255, 0, Filter::Trace),
+            (0, 1, Filter::Debug),
+            (0, 2, Filter::Info),
+            (0, 3, Filter::Warn),
+            (0, 4, Filter::Error),
+            (0, 5, Filter::Off),
+            (0, 255, Filter::Off),
+            (255, 255, Filter::Trace),
+        ];
+
+        for (verbose, quiet, expected) in tests.iter() {
+            assert_filter::<TraceLevel>(*verbose, *quiet, *expected);
+        }
     }
 }

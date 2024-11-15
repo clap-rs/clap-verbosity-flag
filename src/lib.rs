@@ -154,22 +154,17 @@ impl<L: LogLevel> Verbosity<L> {
         self.filter() == Filter::Off
     }
 
-    fn filter(&self) -> Filter {
-        #[cfg(feature = "log")]
-        let filter = Filter::from(L::default());
-        #[cfg(all(not(feature = "log"), feature = "tracing"))]
-        let filter = Filter::from(L::default_tracing());
-        #[cfg(all(not(feature = "log"), not(feature = "tracing")))]
-        let filter = Filter::Off;
-        filter.with_offset(self.verbose as i16 - self.quiet as i16)
+    /// Get the filter level after applying `--verbose` and `--quiet`.
+    pub fn filter(&self) -> Filter {
+        L::default().with_offset(self.verbose as i16 - self.quiet as i16)
     }
 }
 
-/// An internal representation of the log level filter.
+/// A representation of the log level filter.
 ///
 /// Used to calculate the log level and filter.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Filter {
+pub enum Filter {
     Off,
     Error,
     Warn,
@@ -228,13 +223,8 @@ impl<L: LogLevel> fmt::Display for Verbosity<L> {
 
 /// Customize the default log-level and associated help
 pub trait LogLevel {
-    #[cfg(feature = "log")]
     /// Base-line level before applying `--verbose` and `--quiet`
-    fn default() -> Option<log::Level>;
-
-    #[cfg(feature = "tracing")]
-    /// Base-line level before applying `--verbose` and `--quiet`
-    fn default_tracing() -> Option<tracing_core::Level>;
+    fn default() -> Filter;
 
     /// Short-help message for `--verbose`
     fn verbose_help() -> Option<&'static str> {
@@ -258,20 +248,15 @@ pub trait LogLevel {
 }
 
 macro_rules! def_log_levels {
-    ($($name:ident => ($log:expr, $tracing:expr),)*) => {
+    ($($name:ident => $filter:expr,)*) => {
         $(
-            #[derive(Copy, Clone, Debug, Default)]
+            #[doc = concat!("An implementation of [`LogLevel`] that defaults to `", stringify!($filter), "`")]
+            #[derive(Debug, Clone, Copy, PartialEq, Eq)]
             pub struct $name;
 
             impl LogLevel for $name {
-                #[cfg(feature = "log")]
-                fn default() -> Option<log::Level> {
-                    $log
-                }
-
-                #[cfg(feature = "tracing")]
-                fn default_tracing() -> Option<tracing_core::Level> {
-                    $tracing
+                fn default() -> Filter {
+                    $filter
                 }
             }
         )*
@@ -279,12 +264,12 @@ macro_rules! def_log_levels {
 }
 
 def_log_levels! {
-    OffLevel => (None, None),
-    ErrorLevel => (Some(log::Level::Error), Some(tracing_core::Level::ERROR)),
-    WarnLevel => (Some(log::Level::Warn), Some(tracing_core::Level::WARN)),
-    InfoLevel => (Some(log::Level::Info), Some(tracing_core::Level::INFO)),
-    DebugLevel => (Some(log::Level::Debug), Some(tracing_core::Level::DEBUG)),
-    TraceLevel => (Some(log::Level::Trace), Some(tracing_core::Level::TRACE)),
+    OffLevel => Filter::Off,
+    ErrorLevel => Filter::Error,
+    WarnLevel => Filter::Warn,
+    InfoLevel => Filter::Info,
+    DebugLevel => Filter::Debug,
+    TraceLevel => Filter::Trace,
 }
 
 #[cfg(test)]

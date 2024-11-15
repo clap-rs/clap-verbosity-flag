@@ -169,7 +169,7 @@ impl<L: LogLevel> Verbosity<L> {
 ///
 /// Used to calculate the log level and filter.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Filter {
+enum Filter {
     Off,
     Error,
     Warn,
@@ -213,9 +213,9 @@ impl Filter {
     }
 }
 
-impl fmt::Display for Filter {
+impl<L: LogLevel> fmt::Display for Verbosity<L> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
+        match self.filter() {
             Filter::Off => write!(f, "off"),
             Filter::Error => write!(f, "error"),
             Filter::Warn => write!(f, "warn"),
@@ -223,12 +223,6 @@ impl fmt::Display for Filter {
             Filter::Debug => write!(f, "debug"),
             Filter::Trace => write!(f, "trace"),
         }
-    }
-}
-
-impl<L: LogLevel> fmt::Display for Verbosity<L> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.filter())
     }
 }
 

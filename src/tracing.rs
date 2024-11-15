@@ -3,7 +3,7 @@
 // more information.
 pub use tracing_core::{Level, LevelFilter};
 
-use crate::{Filter, LogLevel};
+use crate::Filter;
 
 impl From<Filter> for LevelFilter {
     fn from(filter: Filter) -> Self {
@@ -57,37 +57,9 @@ impl From<Option<Level>> for Filter {
     }
 }
 
-/// Defines a list of log levels that can be used with `Verbosity`.
-macro_rules! log_levels {
-    ($($name:ident => $level:expr,)*) => {
-        $(
-            #[doc = concat!("Default to [`tracing_core::Level::", stringify!($name), "`]")]
-            #[derive(Copy, Clone, Debug, Default)]
-            pub struct $name;
-
-            impl LogLevel for $name {
-                type Level = Level;
-                type LevelFilter = LevelFilter;
-                fn default() -> Option<Level> {
-                    $level
-                }
-            }
-        )*
-    };
-}
-
-log_levels! {
-    OffLevel => None,
-    ErrorLevel => Some(Level::ERROR),
-    WarnLevel => Some(Level::WARN),
-    InfoLevel => Some(Level::INFO),
-    DebugLevel => Some(Level::DEBUG),
-    TraceLevel => Some(Level::TRACE),
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::Verbosity;
+    use crate::{DebugLevel, ErrorLevel, InfoLevel, OffLevel, TraceLevel, Verbosity, WarnLevel};
 
     use super::*;
 
@@ -111,12 +83,12 @@ mod tests {
         for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
             let v = Verbosity::<OffLevel>::new(*verbose, *quiet);
             assert_eq!(
-                v.log_level(),
+                v.tracing_level(),
                 *expected_level,
                 "verbose = {verbose}, quiet = {quiet}"
             );
             assert_eq!(
-                v.log_level_filter(),
+                v.tracing_level_filter(),
                 *expected_filter,
                 "verbose = {verbose}, quiet = {quiet}"
             );
@@ -143,12 +115,12 @@ mod tests {
         for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
             let v = Verbosity::<ErrorLevel>::new(*verbose, *quiet);
             assert_eq!(
-                v.log_level(),
+                v.tracing_level(),
                 *expected_level,
                 "verbose = {verbose}, quiet = {quiet}"
             );
             assert_eq!(
-                v.log_level_filter(),
+                v.tracing_level_filter(),
                 *expected_filter,
                 "verbose = {verbose}, quiet = {quiet}"
             );
@@ -175,12 +147,12 @@ mod tests {
         for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
             let v = Verbosity::<WarnLevel>::new(*verbose, *quiet);
             assert_eq!(
-                v.log_level(),
+                v.tracing_level(),
                 *expected_level,
                 "verbose = {verbose}, quiet = {quiet}"
             );
             assert_eq!(
-                v.log_level_filter(),
+                v.tracing_level_filter(),
                 *expected_filter,
                 "verbose = {verbose}, quiet = {quiet}"
             );
@@ -207,12 +179,12 @@ mod tests {
         for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
             let v = Verbosity::<InfoLevel>::new(*verbose, *quiet);
             assert_eq!(
-                v.log_level(),
+                v.tracing_level(),
                 *expected_level,
                 "verbose = {verbose}, quiet = {quiet}"
             );
             assert_eq!(
-                v.log_level_filter(),
+                v.tracing_level_filter(),
                 *expected_filter,
                 "verbose = {verbose}, quiet = {quiet}"
             );
@@ -238,12 +210,12 @@ mod tests {
         for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
             let v = Verbosity::<DebugLevel>::new(*verbose, *quiet);
             assert_eq!(
-                v.log_level(),
+                v.tracing_level(),
                 *expected_level,
                 "verbose = {verbose}, quiet = {quiet}"
             );
             assert_eq!(
-                v.log_level_filter(),
+                v.tracing_level_filter(),
                 *expected_filter,
                 "verbose = {verbose}, quiet = {quiet}"
             );
@@ -269,12 +241,12 @@ mod tests {
         for (verbose, quiet, expected_level, expected_filter) in tests.iter() {
             let v = Verbosity::<TraceLevel>::new(*verbose, *quiet);
             assert_eq!(
-                v.log_level(),
+                v.tracing_level(),
                 *expected_level,
                 "verbose = {verbose}, quiet = {quiet}"
             );
             assert_eq!(
-                v.log_level_filter(),
+                v.tracing_level_filter(),
                 *expected_filter,
                 "verbose = {verbose}, quiet = {quiet}"
             );

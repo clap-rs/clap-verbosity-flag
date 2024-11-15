@@ -4,6 +4,7 @@
 //!
 //! To get `--quiet` and `--verbose` flags through your entire program, just `flatten`
 //! [`Verbosity`]:
+//!
 //! ```rust,no_run
 //! # use clap::Parser;
 //! # use clap_verbosity_flag::Verbosity;
@@ -17,6 +18,7 @@
 //! ```
 //!
 //! You can then use this to configure your logger:
+//!
 //! ```rust,no_run
 //! # use clap::Parser;
 //! # use clap_verbosity_flag::Verbosity;
@@ -28,8 +30,14 @@
 //! #     verbose: Verbosity,
 //! # }
 //! let cli = Cli::parse();
+//! # #[cfg(feature = "log")]
 //! env_logger::Builder::new()
 //!     .filter_level(cli.verbose.log_level_filter())
+//!     .init();
+//!
+//! # #[cfg(feature = "tracing")]
+//! tracing_subscriber::fmt()
+//!     .with_max_level(cli.verbose.tracing_level_filter())
 //!     .init();
 //! ```
 //!
@@ -41,6 +49,7 @@
 //! - `-vvvv` show trace
 //!
 //! You can also customize the default logging level:
+//!
 //! ```rust,no_run
 //! # use clap::Parser;
 //! use clap_verbosity_flag::{Verbosity, InfoLevel};
@@ -59,19 +68,15 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-/// These types are re-exported for backwards compatibility only.
-#[cfg(any(doc, feature = "log"))]
-#[doc(hidden)]
-pub use self::log::{ErrorLevel, InfoLevel, WarnLevel};
+use std::fmt;
 
-#[cfg(any(doc, feature = "log"))]
+#[cfg(feature = "log")]
 pub mod log;
 
-#[cfg(any(doc, feature = "tracing"))]
+#[cfg(feature = "tracing")]
 pub mod tracing;
 
 /// Logging flags to `#[command(flatten)]` into your CLI
-#[cfg(any(doc, feature = "log"))]
 #[derive(clap::Args, Debug, Clone, Default)]
 #[command(about = None, long_about = None)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
@@ -100,40 +105,7 @@ pub struct Verbosity<L: LogLevel = ErrorLevel> {
     phantom: std::marker::PhantomData<L>,
 }
 
-/// Logging flags to `#[command(flatten)]` into your CLI
-#[cfg(not(any(doc, feature = "log")))]
-#[derive(clap::Args, Debug, Clone, Default)]
-#[command(about = None, long_about = None)]
-pub struct Verbosity<L: LogLevel> {
-    #[arg(
-        long,
-        short = 'v',
-        action = clap::ArgAction::Count,
-        global = true,
-        help = L::verbose_help(),
-        long_help = L::verbose_long_help(),
-    )]
-    verbose: u8,
-
-    #[arg(
-        long,
-        short = 'q',
-        action = clap::ArgAction::Count,
-        global = true,
-        help = L::quiet_help(),
-        long_help = L::quiet_long_help(),
-        conflicts_with = "verbose",
-    )]
-    quiet: u8,
-
-    #[arg(skip)]
-    phantom: std::marker::PhantomData<L>,
-}
-
-impl<L: LogLevel> Verbosity<L>
-where
-    Filter: Into<Option<L::Level>> + Into<L::LevelFilter> + From<Option<L::Level>>,
-{
+impl<L: LogLevel> Verbosity<L> {
     /// Create a new verbosity instance by explicitly setting the values
     pub fn new(verbose: u8, quiet: u8) -> Self {
         Verbosity {
@@ -152,12 +124,28 @@ where
     /// Get the log level.
     ///
     /// `None` means all output is disabled.
-    pub fn log_level(&self) -> Option<L::Level> {
+    #[cfg(feature = "log")]
+    pub fn log_level(&self) -> Option<log::Level> {
         self.filter().into()
     }
 
     /// Get the log level filter.
-    pub fn log_level_filter(&self) -> L::LevelFilter {
+    #[cfg(feature = "log")]
+    pub fn log_level_filter(&self) -> log::LevelFilter {
+        self.filter().into()
+    }
+
+    /// Get the trace level.
+    ///
+    /// `None` means all output is disabled.
+    #[cfg(feature = "tracing")]
+    pub fn tracing_level(&self) -> Option<tracing_core::Level> {
+        self.filter().into()
+    }
+
+    /// Get the trace level filter.
+    #[cfg(feature = "tracing")]
+    pub fn tracing_level_filter(&self) -> tracing_core::LevelFilter {
         self.filter().into()
     }
 
@@ -167,8 +155,13 @@ where
     }
 
     fn filter(&self) -> Filter {
-        let offset = self.verbose as i16 - self.quiet as i16;
-        Filter::from(L::default()).with_offset(offset)
+        #[cfg(feature = "log")]
+        let filter = Filter::from(L::default());
+        #[cfg(all(not(feature = "log"), feature = "tracing"))]
+        let filter = Filter::from(L::default_tracing());
+        #[cfg(all(not(feature = "log"), not(feature = "tracing")))]
+        let filter = Filter::Off;
+        filter.with_offset(self.verbose as i16 - self.quiet as i16)
     }
 }
 
@@ -233,12 +226,7 @@ impl fmt::Display for Filter {
     }
 }
 
-use std::fmt;
-
-impl<L: LogLevel> fmt::Display for Verbosity<L>
-where
-    Filter: Into<Option<L::Level>> + Into<L::LevelFilter> + From<Option<L::Level>>,
-{
+impl<L: LogLevel> fmt::Display for Verbosity<L> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.filter())
     }
@@ -246,11 +234,13 @@ where
 
 /// Customize the default log-level and associated help
 pub trait LogLevel {
-    type Level;
-    type LevelFilter;
-
+    #[cfg(feature = "log")]
     /// Base-line level before applying `--verbose` and `--quiet`
-    fn default() -> Option<Self::Level>;
+    fn default() -> Option<log::Level>;
+
+    #[cfg(feature = "tracing")]
+    /// Base-line level before applying `--verbose` and `--quiet`
+    fn default_tracing() -> Option<tracing_core::Level>;
 
     /// Short-help message for `--verbose`
     fn verbose_help() -> Option<&'static str> {
@@ -273,13 +263,43 @@ pub trait LogLevel {
     }
 }
 
+macro_rules! def_log_levels {
+    ($($name:ident => ($log:expr, $tracing:expr),)*) => {
+        $(
+            #[derive(Copy, Clone, Debug, Default)]
+            pub struct $name;
+
+            impl LogLevel for $name {
+                #[cfg(feature = "log")]
+                fn default() -> Option<log::Level> {
+                    $log
+                }
+
+                #[cfg(feature = "tracing")]
+                fn default_tracing() -> Option<tracing_core::Level> {
+                    $tracing
+                }
+            }
+        )*
+    };
+}
+
+def_log_levels! {
+    OffLevel => (None, None),
+    ErrorLevel => (Some(log::Level::Error), Some(tracing_core::Level::ERROR)),
+    WarnLevel => (Some(log::Level::Warn), Some(tracing_core::Level::WARN)),
+    InfoLevel => (Some(log::Level::Info), Some(tracing_core::Level::INFO)),
+    DebugLevel => (Some(log::Level::Debug), Some(tracing_core::Level::DEBUG)),
+    TraceLevel => (Some(log::Level::Trace), Some(tracing_core::Level::TRACE)),
+}
+
 #[cfg(test)]
 mod test {
-    #[allow(unused_imports)]
+    use clap::CommandFactory;
+
     use super::*;
 
     #[test]
-    #[cfg(feature = "log")]
     fn default_verbosity() {
         #[derive(Debug, clap::Parser)]
         struct Cli {
@@ -287,33 +307,17 @@ mod test {
             verbose: Verbosity,
         }
 
-        use clap::CommandFactory;
         Cli::command().debug_assert();
     }
 
     #[test]
-    #[cfg(feature = "log")]
-    fn verbosity_with_log() {
+    fn verbosity_with_specified_log_level() {
         #[derive(Debug, clap::Parser)]
         struct Cli {
             #[command(flatten)]
             verbose: Verbosity<InfoLevel>,
         }
 
-        use clap::CommandFactory;
-        Cli::command().debug_assert();
-    }
-
-    #[test]
-    #[cfg(feature = "tracing")]
-    fn verbosity_with_tracing() {
-        #[derive(Debug, clap::Parser)]
-        struct Cli {
-            #[command(flatten)]
-            verbose: Verbosity<tracing::ErrorLevel>,
-        }
-
-        use clap::CommandFactory;
         Cli::command().debug_assert();
     }
 }

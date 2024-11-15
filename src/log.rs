@@ -1,10 +1,9 @@
 // These re-exports of the log crate make it easy to use this crate without having to depend on the
 // log crate directly. See <https://github.com/clap-rs/clap-verbosity-flag/issues/54> for more
 // information.
-pub use log::Level;
-pub use log::LevelFilter;
+pub use log::{Level, LevelFilter};
 
-use crate::{Filter, LogLevel};
+use crate::Filter;
 
 impl From<Filter> for LevelFilter {
     fn from(filter: Filter) -> Self {
@@ -58,37 +57,9 @@ impl From<Option<Level>> for Filter {
     }
 }
 
-/// Defines a list of log levels that can be used with `Verbosity`.
-macro_rules! log_levels {
-    ($($name:ident => $level:expr,)*) => {
-        $(
-            #[doc = concat!("Default to [`log::Level::", stringify!($name), "`]")]
-            #[derive(Copy, Clone, Debug, Default)]
-            pub struct $name;
-
-            impl LogLevel for $name {
-                type Level = Level;
-                type LevelFilter = LevelFilter;
-                fn default() -> Option<Level> {
-                    $level
-                }
-            }
-        )*
-    }
-}
-
-log_levels! {
-    OffLevel => None,
-    ErrorLevel => Some(Level::Error),
-    WarnLevel => Some(Level::Warn),
-    InfoLevel => Some(Level::Info),
-    DebugLevel => Some(Level::Debug),
-    TraceLevel => Some(Level::Trace),
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::Verbosity;
+    use crate::{DebugLevel, ErrorLevel, InfoLevel, OffLevel, TraceLevel, Verbosity, WarnLevel};
 
     use super::*;
 

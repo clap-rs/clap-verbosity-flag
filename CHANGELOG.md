@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.2.3] - 2024-11-16
+
 ### Features
 
 - Add `DebugLevel` and `TraceLevel` for exploratory programming
@@ -140,7 +142,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2017-06-02
 
 <!-- next-url -->
-[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.2...HEAD
+[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.3...HEAD
+[2.2.3]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.2...v2.2.3
 [2.2.2]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.1.2...v2.2.0

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Features
+
+- Add `DebugLevel` and `TraceLevel` for exploratory programming
+
 ## [2.2.2] - 2024-09-26
 
 ### Fixes

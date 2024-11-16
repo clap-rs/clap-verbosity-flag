@@ -192,7 +192,6 @@ pub trait LogLevel {
 }
 
 /// Default to [`log::Level::Error`]
-#[allow(clippy::exhaustive_structs)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct ErrorLevel;
 
@@ -203,7 +202,6 @@ impl LogLevel for ErrorLevel {
 }
 
 /// Default to [`log::Level::Warn`]
-#[allow(clippy::exhaustive_structs)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct WarnLevel;
 
@@ -214,7 +212,6 @@ impl LogLevel for WarnLevel {
 }
 
 /// Default to [`log::Level::Info`]
-#[allow(clippy::exhaustive_structs)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct InfoLevel;
 

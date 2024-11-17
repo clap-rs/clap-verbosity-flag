@@ -77,7 +77,7 @@ dependencies = [
  "env_logger",
  "log",
  "tracing",
- "tracing-log",
+ "tracing-core",
  "tracing-subscriber",
 ]
 

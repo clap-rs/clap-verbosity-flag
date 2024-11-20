@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Breaking Changes
+
+- Log support put behind the default `log` feature
+- `LogLevel::default` renamed to `LogLevel::default_filter` and now returns `VerbosityFilter`
+- `Level` and `LevelFilter` are moved into the `log` mod
+
+### Features
+
+- Add `tracing` feature with `Verbosity::tracing_level` and `Verbosity::tracing_level_filter`
+
 ## [2.2.3] - 2024-11-16
 
 ### Features

@@ -66,6 +66,8 @@ use std::fmt;
 
 #[cfg(feature = "log")]
 pub mod log;
+#[cfg(feature = "tracing")]
+pub mod tracing;
 
 /// Logging flags to `#[command(flatten)]` into your CLI
 #[derive(clap::Args, Debug, Clone, Default)]
@@ -135,6 +137,21 @@ impl<L: LogLevel> Verbosity<L> {
 
     /// Get the log level filter.
     pub fn log_level_filter(&self) -> log::LevelFilter {
+        self.filter().into()
+    }
+}
+
+#[cfg(feature = "tracing")]
+impl<L: LogLevel> Verbosity<L> {
+    /// Get the tracing level.
+    ///
+    /// `None` means all output is disabled.
+    pub fn tracing_level(&self) -> Option<tracing_core::Level> {
+        self.filter().into()
+    }
+
+    /// Get the tracing level filter.
+    pub fn tracing_level_filter(&self) -> tracing_core::LevelFilter {
         self.filter().into()
     }
 }

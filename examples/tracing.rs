@@ -5,14 +5,14 @@ use clap_verbosity_flag::Verbosity;
 #[derive(Debug, Parser)]
 struct Cli {
     #[command(flatten)]
-    verbose: Verbosity,
+    verbosity: Verbosity,
 }
 
 fn main() {
     let cli = Cli::parse();
 
     tracing_subscriber::fmt()
-        .with_max_level(cli.verbose.tracing_level_filter())
+        .with_max_level(cli.verbosity)
         .init();
 
     tracing::error!("Engines exploded");

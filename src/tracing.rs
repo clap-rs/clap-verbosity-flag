@@ -3,7 +3,7 @@
 // more information.
 pub use tracing_core::{Level, LevelFilter};
 
-use crate::VerbosityFilter;
+use crate::{LogLevel, Verbosity, VerbosityFilter};
 
 impl From<VerbosityFilter> for LevelFilter {
     fn from(filter: VerbosityFilter) -> Self {
@@ -57,6 +57,18 @@ impl From<Option<Level>> for VerbosityFilter {
     }
 }
 
+impl<L: LogLevel> From<Verbosity<L>> for LevelFilter {
+    fn from(v: Verbosity<L>) -> Self {
+        v.tracing_level_filter()
+    }
+}
+
+impl<L: LogLevel> From<Verbosity<L>> for Option<Level> {
+    fn from(v: Verbosity<L>) -> Self {
+        v.tracing_level()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -87,5 +99,47 @@ mod tests {
         let v = Verbosity::<TraceLevel>::default();
         assert_eq!(v.tracing_level(), Some(Level::TRACE));
         assert_eq!(v.tracing_level_filter(), LevelFilter::TRACE);
+    }
+
+    #[test]
+    fn into_opt_level() {
+        let v = Verbosity::<OffLevel>::default();
+        assert_eq!(Option::<Level>::from(v), None);
+
+        let v = Verbosity::<ErrorLevel>::default();
+        assert_eq!(Option::<Level>::from(v), Some(Level::ERROR));
+
+        let v = Verbosity::<WarnLevel>::default();
+        assert_eq!(Option::<Level>::from(v), Some(Level::WARN));
+
+        let v = Verbosity::<InfoLevel>::default();
+        assert_eq!(Option::<Level>::from(v), Some(Level::INFO));
+
+        let v = Verbosity::<DebugLevel>::default();
+        assert_eq!(Option::<Level>::from(v), Some(Level::DEBUG));
+
+        let v = Verbosity::<TraceLevel>::default();
+        assert_eq!(Option::<Level>::from(v), Some(Level::TRACE));
+    }
+
+    #[test]
+    fn into_level_filter() {
+        let v = Verbosity::<OffLevel>::default();
+        assert_eq!(LevelFilter::from(v), LevelFilter::OFF);
+
+        let v = Verbosity::<ErrorLevel>::default();
+        assert_eq!(LevelFilter::from(v), LevelFilter::ERROR);
+
+        let v = Verbosity::<WarnLevel>::default();
+        assert_eq!(LevelFilter::from(v), LevelFilter::WARN);
+
+        let v = Verbosity::<InfoLevel>::default();
+        assert_eq!(LevelFilter::from(v), LevelFilter::INFO);
+
+        let v = Verbosity::<DebugLevel>::default();
+        assert_eq!(LevelFilter::from(v), LevelFilter::DEBUG);
+
+        let v = Verbosity::<TraceLevel>::default();
+        assert_eq!(LevelFilter::from(v), LevelFilter::TRACE);
     }
 }

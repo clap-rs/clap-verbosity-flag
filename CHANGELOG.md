@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [3.0.1] - 2024-11-26
+
 ### Features
 
 - Add `impl From<Verbosity>` for logging level and level-filter types
@@ -158,7 +160,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2017-06-02
 
 <!-- next-url -->
-[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.3...v3.0.0
 [2.2.3]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.2...v2.2.3
 [2.2.2]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.1...v2.2.2

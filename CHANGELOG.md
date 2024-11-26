@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Features
+
+- Add `impl From<Verbosity>` for logging level and level-filter types
+
 ## [3.0.0] - 2024-11-20
 
 ### Breaking Changes

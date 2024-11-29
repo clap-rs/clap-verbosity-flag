@@ -200,6 +200,21 @@ impl<L: LogLevel> fmt::Display for Verbosity<L> {
     }
 }
 
+impl<L: LogLevel> From<Verbosity<L>> for VerbosityFilter {
+    fn from(verbosity: Verbosity<L>) -> Self {
+        verbosity.filter()
+    }
+}
+
+impl<L: LogLevel> From<VerbosityFilter> for Verbosity<L> {
+    fn from(filter: VerbosityFilter) -> Self {
+        let default = L::default_filter();
+        let verbose = filter.value().saturating_sub(default.value());
+        let quiet = default.value().saturating_sub(filter.value());
+        Verbosity::new(verbose, quiet)
+    }
+}
+
 /// Customize the default log-level and associated help
 pub trait LogLevel {
     /// Baseline level before applying `--verbose` and `--quiet`
@@ -244,21 +259,27 @@ impl VerbosityFilter {
     ///
     /// Negative values will decrease the verbosity, while positive values will increase it.
     fn with_offset(&self, offset: i16) -> VerbosityFilter {
-        let value = match self {
-            Self::Off => 0_i16,
-            Self::Error => 1,
-            Self::Warn => 2,
-            Self::Info => 3,
-            Self::Debug => 4,
-            Self::Trace => 5,
-        };
-        match value.saturating_add(offset) {
+        match i16::from(self.value()).saturating_add(offset) {
             i16::MIN..=0 => Self::Off,
             1 => Self::Error,
             2 => Self::Warn,
             3 => Self::Info,
             4 => Self::Debug,
             5..=i16::MAX => Self::Trace,
+        }
+    }
+
+    /// Get the numeric value of the filter.
+    ///
+    /// This is an internal representation of the filter level used only for conversion / offset.
+    fn value(&self) -> u8 {
+        match self {
+            Self::Off => 0,
+            Self::Error => 1,
+            Self::Warn => 2,
+            Self::Info => 3,
+            Self::Debug => 4,
+            Self::Trace => 5,
         }
     }
 }
@@ -491,4 +512,24 @@ mod test {
             assert_filter::<TraceLevel>(verbose, quiet, expected_filter);
         }
     }
+
+    #[test]
+    fn from_verbosity_filter() {
+        for &filter in &[
+            VerbosityFilter::Off,
+            VerbosityFilter::Error,
+            VerbosityFilter::Warn,
+            VerbosityFilter::Info,
+            VerbosityFilter::Debug,
+            VerbosityFilter::Trace,
+        ] {
+            assert_eq!(Verbosity::<OffLevel>::from(filter).filter(), filter);
+            assert_eq!(Verbosity::<ErrorLevel>::from(filter).filter(), filter);
+            assert_eq!(Verbosity::<WarnLevel>::from(filter).filter(), filter);
+            assert_eq!(Verbosity::<InfoLevel>::from(filter).filter(), filter);
+            assert_eq!(Verbosity::<DebugLevel>::from(filter).filter(), filter);
+            assert_eq!(Verbosity::<TraceLevel>::from(filter).filter(), filter);
+        }
+    }
+}
 }

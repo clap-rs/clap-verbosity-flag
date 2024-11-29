@@ -108,7 +108,7 @@ pub mod log;
 pub mod tracing;
 
 /// Logging flags to `#[command(flatten)]` into your CLI
-#[derive(clap::Args, Debug, Clone, Copy, Default)]
+#[derive(clap::Args, Debug, Clone, Copy, Default, PartialEq, Eq)]
 #[command(about = None, long_about = None)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(
@@ -277,7 +277,7 @@ impl fmt::Display for VerbosityFilter {
 }
 
 /// Default to [`VerbosityFilter::Error`]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub struct ErrorLevel;
 
 impl LogLevel for ErrorLevel {
@@ -287,7 +287,7 @@ impl LogLevel for ErrorLevel {
 }
 
 /// Default to [`VerbosityFilter::Warn`]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub struct WarnLevel;
 
 impl LogLevel for WarnLevel {
@@ -297,7 +297,7 @@ impl LogLevel for WarnLevel {
 }
 
 /// Default to [`VerbosityFilter::Info`]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub struct InfoLevel;
 
 impl LogLevel for InfoLevel {
@@ -307,7 +307,7 @@ impl LogLevel for InfoLevel {
 }
 
 /// Default to [`VerbosityFilter::Debug`]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub struct DebugLevel;
 
 impl LogLevel for DebugLevel {
@@ -317,7 +317,7 @@ impl LogLevel for DebugLevel {
 }
 
 /// Default to [`VerbosityFilter::Trace`]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub struct TraceLevel;
 
 impl LogLevel for TraceLevel {
@@ -327,7 +327,7 @@ impl LogLevel for TraceLevel {
 }
 
 /// Default to [`VerbosityFilter::Off`] (no logging)
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub struct OffLevel;
 
 impl LogLevel for OffLevel {

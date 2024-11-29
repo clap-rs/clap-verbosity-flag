@@ -110,6 +110,19 @@ pub mod tracing;
 /// Logging flags to `#[command(flatten)]` into your CLI
 #[derive(clap::Args, Debug, Clone, Copy, Default, PartialEq, Eq)]
 #[command(about = None, long_about = None)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(
+        from = "VerbosityFilter",
+        into = "VerbosityFilter",
+        bound(serialize = "L: Clone")
+    )
+)]
+#[cfg_attr(
+    feature = "serde",
+    doc = r#"This type serializes to a string representation of the log level, e.g. `"Debug"`"#
+)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(
         long,
@@ -245,6 +258,8 @@ pub trait LogLevel {
 ///
 /// Used to calculate the log level and filter.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
 pub enum VerbosityFilter {
     Off,
     Error,
@@ -532,4 +547,65 @@ mod test {
         }
     }
 }
+
+#[cfg(feature = "serde")]
+#[cfg(test)]
+mod serde_tests {
+    use super::*;
+
+    use clap::Parser;
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Parser, Serialize, Deserialize)]
+    struct Cli {
+        meaning_of_life: u8,
+        #[command(flatten)]
+        verbosity: Verbosity<InfoLevel>,
+    }
+
+    #[test]
+    fn serialize_toml() {
+        let cli = Cli {
+            meaning_of_life: 42,
+            verbosity: Verbosity::new(2, 1),
+        };
+        let toml = toml::to_string(&cli).unwrap();
+        assert_eq!(toml, "meaning_of_life = 42\nverbosity = \"debug\"\n");
+    }
+
+    #[test]
+    fn deserialize_toml() {
+        let toml = "meaning_of_life = 42\nverbosity = \"debug\"\n";
+        let cli: Cli = toml::from_str(toml).unwrap();
+        assert_eq!(cli.meaning_of_life, 42);
+        assert_eq!(cli.verbosity.filter(), VerbosityFilter::Debug);
+    }
+
+    /// Tests that the `Verbosity` can be serialized and deserialized correctly from an a token.
+    #[test]
+    fn serde_round_trips() {
+        use serde_test::{assert_tokens, Token};
+
+        for (filter, variant) in [
+            (VerbosityFilter::Off, "off"),
+            (VerbosityFilter::Error, "error"),
+            (VerbosityFilter::Warn, "warn"),
+            (VerbosityFilter::Info, "info"),
+            (VerbosityFilter::Debug, "debug"),
+            (VerbosityFilter::Trace, "trace"),
+        ] {
+            let tokens = &[Token::UnitVariant {
+                name: "VerbosityFilter",
+                variant,
+            }];
+
+            // `assert_tokens` checks both serialization and deserialization.
+            assert_tokens(&Verbosity::<OffLevel>::from(filter), tokens);
+            assert_tokens(&Verbosity::<ErrorLevel>::from(filter), tokens);
+            assert_tokens(&Verbosity::<WarnLevel>::from(filter), tokens);
+            assert_tokens(&Verbosity::<InfoLevel>::from(filter), tokens);
+            assert_tokens(&Verbosity::<DebugLevel>::from(filter), tokens);
+            assert_tokens(&Verbosity::<TraceLevel>::from(filter), tokens);
+        }
+    }
 }

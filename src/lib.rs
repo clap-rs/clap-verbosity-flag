@@ -70,7 +70,7 @@ pub mod log;
 pub mod tracing;
 
 /// Logging flags to `#[command(flatten)]` into your CLI
-#[derive(clap::Args, Debug, Clone, Default)]
+#[derive(clap::Args, Debug, Clone, Copy, Default)]
 #[command(about = None, long_about = None)]
 pub struct Verbosity<L: LogLevel = ErrorLevel> {
     #[arg(

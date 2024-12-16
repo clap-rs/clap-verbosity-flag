@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [3.0.2] - 2024-12-16
+
 ### Features
 
 - Add a `Copy` impl to `Verbosity`
@@ -164,7 +166,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2017-06-02
 
 <!-- next-url -->
-[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.2...HEAD
+[3.0.2]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.3...v3.0.0
 [2.2.3]: https://github.com/clap-rs/clap-verbosity-flag/compare/v2.2.2...v2.2.3

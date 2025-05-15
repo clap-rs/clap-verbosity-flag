@@ -1,45 +1,80 @@
-//! Control `log` level with a `--verbose` flag for your CLI
+//! Easily add `--verbose` and `--quiet` flags to CLIs using [Clap](http://crates.io/crates/clap).
 //!
 //! # Examples
 //!
 //! To get `--quiet` and `--verbose` flags through your entire program, just `flatten`
 //! [`Verbosity`]:
+//!
 //! ```rust,no_run
-//! # use clap::Parser;
-//! # use clap_verbosity_flag::Verbosity;
-//! #
-//! # /// Le CLI
-//! # #[derive(Debug, Parser)]
-//! # struct Cli {
-//! #[command(flatten)]
-//! verbose: Verbosity,
-//! # }
+//! use clap::Parser;
+//! use clap_verbosity_flag::Verbosity;
+//!
+//! #[derive(Debug, Parser)]
+//! struct Cli {
+//!     #[command(flatten)]
+//!     verbosity: Verbosity,
+//!
+//!     // ... other options
+//! }
 //! ```
 //!
 //! You can then use this to configure your logger:
+//!
 //! ```rust,no_run
 //! # use clap::Parser;
 //! # use clap_verbosity_flag::Verbosity;
 //! #
-//! # /// Le CLI
 //! # #[derive(Debug, Parser)]
 //! # struct Cli {
 //! #     #[command(flatten)]
-//! #     verbose: Verbosity,
+//! #     verbosity: Verbosity,
 //! # }
 //! let cli = Cli::parse();
 //! # #[cfg(feature = "log")]
 //! env_logger::Builder::new()
-//!     .filter_level(cli.verbose.log_level_filter())
+//!     .filter_level(cli.verbosity.log_level_filter())
 //!     .init();
 //! ```
 //!
-//! By default, this will only report errors.
-//! - `-q` silences output
-//! - `-v` show warnings
-//! - `-vv` show info
-//! - `-vvv` show debug
-//! - `-vvvv` show trace
+//! ## Use with `tracing`
+//!
+//! To use with [`tracing`](https://crates.io/crates/tracing), disable the log feature flag and
+//! enable the `tracing` feature flag:
+//!
+//! ```shell
+//! cargo add clap_verbosity_flag --no-default features --features tracing
+//! ```
+//!
+//! Then you can use it like this:
+//!
+//! ```rust,no_run
+//! # use clap::Parser;
+//! # use clap_verbosity_flag::Verbosity;
+//! #
+//! # #[derive(Debug, Parser)]
+//! # struct Cli {
+//! #     #[command(flatten)]
+//! #     verbosity: Verbosity,
+//! # }
+//! let cli = Cli::parse();
+//! # #[cfg(feature = "tracing")]
+//! tracing_subscriber::fmt()
+//!     .with_max_level(cli.verbosity)
+//!     .init();
+//! ```
+//!
+//! # Using `--verbose` and `--quiet` flags
+//!
+//! The default verbosity level will cause `log` / `tracing` to only report errors. The flags can be
+//!  specified multiple times to increase or decrease the verbosity level.
+//!
+//! - silence output: `-q` / `--quiet`
+//! - show warnings: `-v` / `--verbose`
+//! - show info: `-vv` / `--verbose --verbose`
+//! - show debug: `-vvv` / `--verbose --verbose --verbose`
+//! - show trace: `-vvvv` / `--verbose --verbose --verbose --verbose`
+//!
+//! # Customizing the default log level
 //!
 //! By default, the log level is set to Error. To customize this to a different level, pass a type
 //! implementing the [`LogLevel`] trait to [`Verbosity`]:
@@ -48,7 +83,6 @@
 //! # use clap::Parser;
 //! use clap_verbosity_flag::{Verbosity, InfoLevel};
 //!
-//! /// Le CLI
 //! #[derive(Debug, Parser)]
 //! struct Cli {
 //!     #[command(flatten)]
@@ -63,7 +97,7 @@
 #![warn(clippy::print_stdout)]
 
 #[doc = include_str!("../README.md")]
-#[cfg(doctest)]
+#[cfg(all(doctest, feature = "log", feature = "tracing"))]
 pub struct ReadmeDoctests;
 
 use std::fmt;

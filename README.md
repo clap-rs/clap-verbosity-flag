@@ -1,4 +1,4 @@
-# clap-verbosity-flag for `log`
+# clap-verbosity-flag for `log` / `tracing`
 
 [![Documentation](https://img.shields.io/badge/docs-master-blue.svg)][Documentation]
 ![License](https://img.shields.io/crates/l/clap-verbosity-flag.svg)
@@ -7,27 +7,65 @@
 [Crates.io]: https://crates.io/crates/clap-verbosity-flag
 [Documentation]: https://docs.rs/clap-verbosity-flag/
 
-Easily add a `--verbose` flag to CLIs using Clap
+Easily add `--verbose` and `--quiet` flags to CLIs using [Clap](http://crates.io/crates/clap).
 
 ## Examples
+
+```shell
+cargo add clap-verbosity-flag
+```
 
 ```rust
 use clap::Parser;
 
-// ...
 #[derive(Debug, Parser)]
 struct Cli {
     #[command(flatten)]
-    verbose: clap_verbosity_flag::Verbosity,
+    verbosity: clap_verbosity_flag::Verbosity,
+}
+
+fn main() {
+    let args = Cli::parse();
+    env_logger::Builder::new()
+        .filter_level(args.verbosity.into())
+        .init();
+    // Your code here
 }
 ```
 
-By default, it'll only report errors.
-- `-q` silences output
-- `-v` show warnings
-- `-vv` show info
-- `-vvv` show debug
-- `-vvvv` show trace
+For [`tracing`](https://crates.io/crates/tracing) support, use the `tracing` feature:
+
+```shell
+cargo add clap-verbosity-flag --no-default-features --features tracing
+```
+
+```rust
+use clap::Parser;
+
+#[derive(Debug, Parser)]
+struct Cli {
+    #[command(flatten)]
+    verbosity: clap_verbosity_flag::Verbosity,
+}
+
+fn main() {
+    let args = Cli::parse();
+    tracing_subscriber::fmt()
+        .with_max_level(args.verbosity)
+        .init();
+    // Your code here
+}
+```
+
+The default verbosity level will cause `log` / `tracing` to only report errors. The flags can be
+specified multiple times to increase or decrease the verbosity level. See the [Documentation] for
+info on how to change the default verbosity level.
+
+- silence output: `-q` / `--quiet`
+- show warnings: `-v` / `--verbose`
+- show info: `-vv` / `--verbose --verbose`
+- show debug: `-vvv` / `--verbose --verbose --verbose`
+- show trace: `-vvvv` / `--verbose --verbose --verbose --verbose`
 
 ## License
 

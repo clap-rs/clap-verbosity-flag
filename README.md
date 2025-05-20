@@ -11,8 +11,8 @@ Easily add `--verbose` and `--quiet` flags to CLIs using [Clap](http://crates.io
 
 ## Examples
 
-```shell
-cargo add clap-verbosity-flag
+```console
+$ cargo add clap-verbosity-flag
 ```
 
 ```rust
@@ -35,8 +35,8 @@ fn main() {
 
 For [`tracing`](https://crates.io/crates/tracing) support, use the `tracing` feature:
 
-```shell
-cargo add clap-verbosity-flag --no-default-features --features tracing
+```console
+$ cargo add clap-verbosity-flag --no-default-features --features tracing
 ```
 
 ```rust

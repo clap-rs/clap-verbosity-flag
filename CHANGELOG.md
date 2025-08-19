@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Features
+
+- Add `serde` feature for when mixing CLI and config
+- Add comparison operators to types
+- Add conversions between `Verbosity` and `VerbosityFilter`
+
 ## [3.0.3] - 2025-05-20
 
 ## [3.0.2] - 2024-12-16

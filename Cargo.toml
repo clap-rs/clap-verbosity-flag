@@ -97,7 +97,7 @@ lto = true
 
 [package]
 name = "clap-verbosity-flag"
-version = "3.0.3"
+version = "3.0.4"
 description = "Easily add a `--verbose` flag to CLIs using Clap"
 authors = ["Pascal Hertleif <killercup@gmail.com>"]
 readme = "README.md"

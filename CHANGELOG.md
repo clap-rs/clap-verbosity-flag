@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [3.0.4] - 2025-08-19
+
 ### Features
 
 - Add `serde` feature for when mixing CLI and config
@@ -174,7 +176,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2017-06-02
 
 <!-- next-url -->
-[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.3...HEAD
+[Unreleased]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.4...HEAD
+[3.0.4]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.3...v3.0.4
 [3.0.3]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/clap-rs/clap-verbosity-flag/compare/v3.0.0...v3.0.1

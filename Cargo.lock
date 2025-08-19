@@ -71,7 +71,7 @@ dependencies = [
 
 [[package]]
 name = "clap-verbosity-flag"
-version = "3.0.3"
+version = "3.0.4"
 dependencies = [
  "clap",
  "env_logger",

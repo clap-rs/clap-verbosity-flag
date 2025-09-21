@@ -100,6 +100,7 @@
 #[cfg(all(doctest, feature = "log", feature = "tracing"))]
 pub struct ReadmeDoctests;
 
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 #[cfg(feature = "log")]
@@ -111,6 +112,7 @@ pub mod tracing;
 #[derive(clap::Args, Debug, Clone, Copy, Default, PartialEq, Eq)]
 #[command(about = None, long_about = None)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "jsonschema", derive(jsonschema::JsonSchema))]
 #[cfg_attr(
     feature = "serde",
     serde(
@@ -259,6 +261,7 @@ pub trait LogLevel {
 /// Used to calculate the log level and filter.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "jsonschema", derive(jsonschema::JsonSchema))]
 #[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
 pub enum VerbosityFilter {
     Off,
@@ -314,6 +317,10 @@ impl fmt::Display for VerbosityFilter {
 
 /// Default to [`VerbosityFilter::Error`]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "jsonschema",
+    derive(jsonschema::JsonSchema, serde::Serialize, serde::Deserialize)
+)]
 pub struct ErrorLevel;
 
 impl LogLevel for ErrorLevel {
@@ -324,6 +331,10 @@ impl LogLevel for ErrorLevel {
 
 /// Default to [`VerbosityFilter::Warn`]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "jsonschema",
+    derive(jsonschema::JsonSchema, serde::Serialize, serde::Deserialize)
+)]
 pub struct WarnLevel;
 
 impl LogLevel for WarnLevel {
@@ -334,6 +345,10 @@ impl LogLevel for WarnLevel {
 
 /// Default to [`VerbosityFilter::Info`]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "jsonschema",
+    derive(jsonschema::JsonSchema, serde::Serialize, serde::Deserialize)
+)]
 pub struct InfoLevel;
 
 impl LogLevel for InfoLevel {
@@ -344,6 +359,10 @@ impl LogLevel for InfoLevel {
 
 /// Default to [`VerbosityFilter::Debug`]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "jsonschema",
+    derive(jsonschema::JsonSchema, serde::Serialize, serde::Deserialize)
+)]
 pub struct DebugLevel;
 
 impl LogLevel for DebugLevel {
@@ -354,6 +373,10 @@ impl LogLevel for DebugLevel {
 
 /// Default to [`VerbosityFilter::Trace`]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "jsonschema",
+    derive(jsonschema::JsonSchema, serde::Serialize, serde::Deserialize)
+)]
 pub struct TraceLevel;
 
 impl LogLevel for TraceLevel {
@@ -364,6 +387,10 @@ impl LogLevel for TraceLevel {
 
 /// Default to [`VerbosityFilter::Off`] (no logging)
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "jsonschema",
+    derive(jsonschema::JsonSchema, serde::Serialize, serde::Deserialize)
+)]
 pub struct OffLevel;
 
 impl LogLevel for OffLevel {

@@ -564,19 +564,19 @@ mod serde_tests {
     }
 
     #[test]
-    fn serialize_toml() {
+    fn serialize_json() {
         let cli = Cli {
             meaning_of_life: 42,
             verbosity: Verbosity::new(2, 1),
         };
-        let toml = toml::to_string(&cli).unwrap();
-        assert_eq!(toml, "meaning_of_life = 42\nverbosity = \"debug\"\n");
+        let json = serde_json::to_string(&cli).unwrap();
+        assert_eq!(json, "{\"meaning_of_life\":42,\"verbosity\":\"debug\"}");
     }
 
     #[test]
-    fn deserialize_toml() {
-        let toml = "meaning_of_life = 42\nverbosity = \"debug\"\n";
-        let cli: Cli = toml::from_str(toml).unwrap();
+    fn deserialize_json() {
+        let json = "{\"meaning_of_life\":42,\"verbosity\":\"debug\"}";
+        let cli: Cli = serde_json::from_str(json).unwrap();
         assert_eq!(cli.meaning_of_life, 42);
         assert_eq!(cli.verbosity.filter(), VerbosityFilter::Debug);
     }

@@ -42,7 +42,7 @@
 //! enable the `tracing` feature flag:
 //!
 //! ```shell
-//! cargo add clap_verbosity_flag --no-default features --features tracing
+//! cargo add clap_verbosity_flag --no-default-features --features tracing
 //! ```
 //!
 //! Then you can use it like this:

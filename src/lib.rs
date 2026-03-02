@@ -584,7 +584,7 @@ mod serde_tests {
     /// Tests that the `Verbosity` can be serialized and deserialized correctly from an a token.
     #[test]
     fn serde_round_trips() {
-        use serde_test::{assert_tokens, Token};
+        use serde_test::{Token, assert_tokens};
 
         for (filter, variant) in [
             (VerbosityFilter::Off, "off"),

@@ -43,12 +43,12 @@ enum Command {
 impl Command {
     fn log_level_filter(&self) -> log::LevelFilter {
         match self {
-            Command::Off { verbose } => verbose.log_level_filter(),
-            Command::Error { verbose } => verbose.log_level_filter(),
-            Command::Warn { verbose } => verbose.log_level_filter(),
-            Command::Info { verbose } => verbose.log_level_filter(),
-            Command::Debug { verbose } => verbose.log_level_filter(),
-            Command::Trace { verbose } => verbose.log_level_filter(),
+            Self::Off { verbose } => verbose.log_level_filter(),
+            Self::Error { verbose } => verbose.log_level_filter(),
+            Self::Warn { verbose } => verbose.log_level_filter(),
+            Self::Info { verbose } => verbose.log_level_filter(),
+            Self::Debug { verbose } => verbose.log_level_filter(),
+            Self::Trace { verbose } => verbose.log_level_filter(),
         }
     }
 }

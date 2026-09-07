@@ -152,7 +152,7 @@ pub struct Verbosity<L: LogLevel = ErrorLevel> {
 impl<L: LogLevel> Verbosity<L> {
     /// Create a new verbosity instance by explicitly setting the values
     pub fn new(verbose: u8, quiet: u8) -> Self {
-        Verbosity {
+        Self {
             verbose,
             quiet,
             phantom: std::marker::PhantomData,
@@ -224,7 +224,7 @@ impl<L: LogLevel> From<VerbosityFilter> for Verbosity<L> {
         let default = L::default_filter();
         let verbose = filter.value().saturating_sub(default.value());
         let quiet = default.value().saturating_sub(filter.value());
-        Verbosity::new(verbose, quiet)
+        Self::new(verbose, quiet)
     }
 }
 
@@ -273,7 +273,7 @@ impl VerbosityFilter {
     /// Apply an offset to the filter level.
     ///
     /// Negative values will decrease the verbosity, while positive values will increase it.
-    fn with_offset(&self, offset: i16) -> VerbosityFilter {
+    fn with_offset(&self, offset: i16) -> Self {
         match i16::from(self.value()).saturating_add(offset) {
             i16::MIN..=0 => Self::Off,
             1 => Self::Error,

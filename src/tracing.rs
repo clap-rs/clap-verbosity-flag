@@ -8,12 +8,12 @@ use crate::{LogLevel, Verbosity, VerbosityFilter};
 impl From<VerbosityFilter> for LevelFilter {
     fn from(filter: VerbosityFilter) -> Self {
         match filter {
-            VerbosityFilter::Off => LevelFilter::OFF,
-            VerbosityFilter::Error => LevelFilter::ERROR,
-            VerbosityFilter::Warn => LevelFilter::WARN,
-            VerbosityFilter::Info => LevelFilter::INFO,
-            VerbosityFilter::Debug => LevelFilter::DEBUG,
-            VerbosityFilter::Trace => LevelFilter::TRACE,
+            VerbosityFilter::Off => Self::OFF,
+            VerbosityFilter::Error => Self::ERROR,
+            VerbosityFilter::Warn => Self::WARN,
+            VerbosityFilter::Info => Self::INFO,
+            VerbosityFilter::Debug => Self::DEBUG,
+            VerbosityFilter::Trace => Self::TRACE,
         }
     }
 }

@@ -1,6 +1,6 @@
 # clap-verbosity-flag for `log` / `tracing`
 
-[![Documentation](https://img.shields.io/badge/docs-master-blue.svg)][Documentation]
+[![Documentation](https://img.shields.io/badge/docs-main-blue.svg)][Documentation]
 ![License](https://img.shields.io/crates/l/clap-verbosity-flag.svg)
 [![crates.io](https://img.shields.io/crates/v/clap-verbosity-flag.svg)][Crates.io]
 
